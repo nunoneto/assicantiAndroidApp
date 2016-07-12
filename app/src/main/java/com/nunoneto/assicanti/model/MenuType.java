@@ -1,12 +1,31 @@
 package com.nunoneto.assicanti.model;
 
+import io.realm.RealmList;
+import io.realm.RealmObject;
+
 /**
- * Created by NB20301 on 12/07/2016.
+ * Created by Nuno on 12/07/2016.
  */
-public class MenuType {
+public class MenuType extends RealmObject{
 
-    public static final String VEGAN = "Vegetariano";
-    public static final String MEAT = "Carne";
-    public static final String FISH = "Peixe";
+    private String type; //meat, fish, ...
+    private RealmList<DayMenu> days = new RealmList<>();
 
+    public MenuType(){}
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public RealmList<DayMenu> getDays() {
+        return days;
+    }
+
+    public void setDays(RealmList<DayMenu> days) {
+        this.days = days;
+    }
 }

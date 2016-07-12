@@ -3,8 +3,9 @@ package com.nunoneto.assicanti.webscraper;
 import android.util.Log;
 
 import com.nunoneto.assicanti.model.DayMenu;
-import com.nunoneto.assicanti.model.Menu;
 import com.nunoneto.assicanti.model.MenuType;
+import com.nunoneto.assicanti.model.WeekMenu;
+import com.nunoneto.assicanti.model.Type;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**
@@ -54,94 +55,117 @@ public class WebScrapper {
     /**
      * Parses menu page in order to get the menu information
      */
-    public List<Menu> getMenus(){
+    public WeekMenu getMenus(){
+        WeekMenu weekMenu = null;
 
-        List<Menu> menusArray;
+        //Check if already in realm
+        weekMenu = getWeekMenusFromPersistence();
+        if(weekMenu != null)
+            return weekMenu;
 
-        menusArray = getWeekMenusFromPersistence();
-        if(menusArray != null && menusArray.size() > 0)
-            return menusArray;
-
-        menusArray = new ArrayList<>();
+        //Get document if not in memory
         if(menuPage == null)
             getMenuPage();
 
         Elements els = menuPage.select("div.so-panel.widget.widget_wppizza > article");
 
         // Iterate over each menu: veg, fish, meat, ..
+        weekMenu = null;
+        Realm realm = Realm.getDefaultInstance();
         Iterator<Element> it = els.iterator();
         while (it.hasNext()){
-            Menu thisMenu;
 
             Element el = it.next();
-            Date start = null,
-                    end = null;
 
-            String menuType = el.select("h2.wppizza-article-title").text().replace("Menu ","");
+            //DOM queries
+            String type = el.select("h2.wppizza-article-title").text().replace("Menu ", "");
             Element info = el.select("div.wppizza-article-info").first();
             Elements menus = info.select("p");
             Element date = info.select("p").first();
             Elements dates = date.select("strong,b");
 
-            // Parse Dates
-            if(dates.size() >= 2){
-                start = parseDate(dates.get(0),dates.get(1));
-            }
-            if(dates.size() >= 4){
-                end = parseDate(dates.get(2),dates.get(3));
+            if(weekMenu == null){
+                Date start = null,
+                        end = null;
+                // Parse Dates
+                if(dates.size() >= 2){
+                    start = parseDate(dates.get(0),dates.get(1));
+                }
+                if(dates.size() >= 4){
+                    end = parseDate(dates.get(2),dates.get(3));
+                }
+                realm.beginTransaction();
+                weekMenu = realm.createObject(WeekMenu.class);
+                weekMenu.setStarting(start);
+                weekMenu.setEnding(end);
+                weekMenu.setMenuId();
+                realm.commitTransaction();
             }
 
-            thisMenu = new Menu(start,end,menuType);
+            realm.beginTransaction();
+            MenuType menuType = realm.createObject(MenuType.class);
+            menuType.setType(type);
+            weekMenu.getTypes().add(menuType);
+            realm.commitTransaction();
 
             // get each day menu
-            if(menuType.equals(MenuType.FISH) || menuType.equals(MenuType.VEGAN)){
-                thisMenu.getDays().addAll(parseMeatFish(menus));
+            if(type.equals(Type.FISH) || type.equals(Type.VEGAN)){
+                parseMeatFish(menus, menuType, type);
             }else {
                 Iterator<Element> menuIt = menus.iterator();
                 while (menuIt.hasNext()){
                     Element menu = menuIt.next();
 
-                    // ingore the first elements, its only dates
-                    // dealt with otherwise
+                    // ingore the first elements, it's only dates
+                    // dealt with otherwhere
                     if(!menu.text().equals(date.text())){
                         int dayOfWeek = parseWeekDay(menu.select("p > strong").text());
                         menu.select("p").remove();
                         String description = menu.text();
-                        thisMenu.getDays()
-                                .add(new DayMenu(
-                                        dayOfWeek,
-                                        description
-                                ));
+
+                        realm.beginTransaction();
+                        DayMenu dayMenu = realm.createObject(DayMenu.class);
+                        dayMenu.setDayOfWeek(dayOfWeek);
+                        dayMenu.setDescription(description);
+                        dayMenu.setType(type);
+                        menuType.getDays().add(dayMenu);
+                        realm.commitTransaction();
+
                     }
                 }
             }
-
-            menusArray.add(thisMenu);
         }
 
-        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        menusArray = realm.copyToRealm(menusArray);
+        weekMenu = realm.copyToRealm(weekMenu);
         realm.commitTransaction();
         realm.close();
 
-        return menusArray;
+        return weekMenu;
     }
 
-    private List<Menu> getWeekMenusFromPersistence(){
+    private WeekMenu getWeekMenusFromPersistence(){
 
         Calendar cal = Calendar.getInstance();
+
         cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+        cal.set(Calendar.HOUR,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
         Date startDate = cal.getTime();
+
         cal.set(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
+        cal.set(Calendar.HOUR,23);
+        cal.set(Calendar.MINUTE,59);
+        cal.set(Calendar.SECOND,59);
         Date endDate = cal.getTime();
 
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<Menu> results = realm.where(Menu.class)
+        RealmResults<WeekMenu> results = realm.where(WeekMenu.class)
                 .equalTo("starting",startDate)
                 .equalTo("ending",endDate)
                 .findAll();
-        List<Menu> menus = results != null && results.size() > 0 ? realm.copyFromRealm(results) : null;
+        WeekMenu menus = results != null && results.size() > 0 ? realm.copyFromRealm(results).get(0) : null;
         realm.close();
         return menus;
     }
@@ -194,16 +218,21 @@ public class WebScrapper {
      * ohh well...
      * @return
      */
-    private List<DayMenu> parseMeatFish(Elements menu){
-        List<DayMenu> days = new ArrayList<>();
+    private void parseMeatFish(Elements menu, MenuType menuType, String type){
 
         Element firstDay = menu.select("p").get(1);
         int dayOfWeek = parseWeekDay(firstDay.select("p > strong").first().text());
         firstDay.select("p").remove();
         String description = menu.text();
 
-        DayMenu first = new DayMenu(dayOfWeek,description);
-        days.add(first);
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        DayMenu dayMenu = realm.createObject(DayMenu.class);
+        dayMenu.setDayOfWeek(dayOfWeek);
+        dayMenu.setDescription(description);
+        dayMenu.setType(type);
+        menuType.getDays().add(dayMenu);
+        realm.commitTransaction();
 
         String[] restOfDays = menu.select("p").get(2).html().split("<br>");
         for(String day : restOfDays){
@@ -215,12 +244,16 @@ public class WebScrapper {
                 thisDay.select("p").remove();
                 description = thisDay.text();
 
-                DayMenu thisDayObj = new DayMenu(dayOfWeek,description);
-                days.add(thisDayObj);
+                realm.beginTransaction();
+                dayMenu = realm.createObject(DayMenu.class);
+                dayMenu.setDayOfWeek(dayOfWeek);
+                dayMenu.setDescription(description);
+                dayMenu.setType(type);
+                menuType.getDays().add(dayMenu);
+                realm.commitTransaction();
             }
         }
 
-        return days;
     }
 
 
