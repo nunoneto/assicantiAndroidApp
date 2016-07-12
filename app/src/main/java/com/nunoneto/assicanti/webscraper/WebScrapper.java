@@ -70,9 +70,12 @@ public class WebScrapper {
         Elements els = menuPage.select("div.so-panel.widget.widget_wppizza > article");
 
         // Iterate over each menu: veg, fish, meat, ..
-        weekMenu = null;
+
         Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+
         Iterator<Element> it = els.iterator();
+        weekMenu = null;
         while (it.hasNext()){
 
             Element el = it.next();
@@ -94,19 +97,15 @@ public class WebScrapper {
                 if(dates.size() >= 4){
                     end = parseDate(dates.get(2),dates.get(3));
                 }
-                realm.beginTransaction();
                 weekMenu = realm.createObject(WeekMenu.class);
                 weekMenu.setStarting(start);
                 weekMenu.setEnding(end);
                 weekMenu.setMenuId();
-                realm.commitTransaction();
             }
 
-            realm.beginTransaction();
             MenuType menuType = realm.createObject(MenuType.class);
             menuType.setType(type);
             weekMenu.getTypes().add(menuType);
-            realm.commitTransaction();
 
             // get each day menu
             if(type.equals(Type.FISH) || type.equals(Type.VEGAN)){
@@ -123,21 +122,17 @@ public class WebScrapper {
                         menu.select("p").remove();
                         String description = menu.text();
 
-                        realm.beginTransaction();
                         DayMenu dayMenu = realm.createObject(DayMenu.class);
                         dayMenu.setDayOfWeek(dayOfWeek);
                         dayMenu.setDescription(description);
                         dayMenu.setType(type);
                         menuType.getDays().add(dayMenu);
-                        realm.commitTransaction();
 
                     }
                 }
             }
         }
 
-        realm.beginTransaction();
-        weekMenu = realm.copyToRealm(weekMenu);
         realm.commitTransaction();
         realm.close();
 
@@ -214,25 +209,23 @@ public class WebScrapper {
     }
 
     /**
-     * This deal with some messed up syntax in the html, the fish and vegan are special case
+     * This deals with some messed up syntax in the html, the fish and vegan are special case
      * ohh well...
      * @return
      */
     private void parseMeatFish(Elements menu, MenuType menuType, String type){
+        Realm realm = Realm.getDefaultInstance();
 
         Element firstDay = menu.select("p").get(1);
         int dayOfWeek = parseWeekDay(firstDay.select("p > strong").first().text());
         firstDay.select("p").remove();
         String description = menu.text();
 
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
         DayMenu dayMenu = realm.createObject(DayMenu.class);
         dayMenu.setDayOfWeek(dayOfWeek);
         dayMenu.setDescription(description);
         dayMenu.setType(type);
         menuType.getDays().add(dayMenu);
-        realm.commitTransaction();
 
         String[] restOfDays = menu.select("p").get(2).html().split("<br>");
         for(String day : restOfDays){
@@ -244,13 +237,11 @@ public class WebScrapper {
                 thisDay.select("p").remove();
                 description = thisDay.text();
 
-                realm.beginTransaction();
                 dayMenu = realm.createObject(DayMenu.class);
                 dayMenu.setDayOfWeek(dayOfWeek);
                 dayMenu.setDescription(description);
                 dayMenu.setType(type);
                 menuType.getDays().add(dayMenu);
-                realm.commitTransaction();
             }
         }
 
