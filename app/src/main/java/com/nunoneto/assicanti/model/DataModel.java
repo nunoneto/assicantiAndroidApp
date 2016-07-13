@@ -1,6 +1,13 @@
 package com.nunoneto.assicanti.model;
 
+import com.nunoneto.assicanti.Utils;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Created by Nuno on 12/07/2016.
@@ -10,7 +17,6 @@ public class DataModel {
     private static DataModel instance;
 
     private List<WeekMenu> menus;
-    private WeekMenu currentMenu;
 
     public static DataModel getInstance() {
         return instance != null ? instance : new DataModel();
@@ -25,10 +31,31 @@ public class DataModel {
     }
 
     public WeekMenu getCurrentMenu() {
-        return currentMenu;
+
+        Calendar cal = Utils.getCalendar();
+
+        cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+        cal.add(Calendar.DAY_OF_YEAR,-1);
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        Date startDate = cal.getTime();
+
+        cal.add(Calendar.DAY_OF_YEAR,1);
+        cal.set(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
+        Date endDate = cal.getTime();
+
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<WeekMenu> results = realm.where(WeekMenu.class)
+                .greaterThanOrEqualTo("starting",startDate)
+                .lessThanOrEqualTo("ending",endDate)
+                .findAll();
+        WeekMenu menus = results != null && results.size() > 0 ? realm.copyFromRealm(results).get(0) : null;
+        realm.close();
+        return menus;
+
+
+
     }
 
-    public void setCurrentMenu(WeekMenu currentMenu) {
-        this.currentMenu = currentMenu;
-    }
 }

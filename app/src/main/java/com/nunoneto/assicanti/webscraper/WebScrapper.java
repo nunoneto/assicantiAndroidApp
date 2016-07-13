@@ -2,8 +2,10 @@ package com.nunoneto.assicanti.webscraper;
 
 import android.util.Log;
 
+import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.DayMenu;
 import com.nunoneto.assicanti.model.MenuType;
+import com.nunoneto.assicanti.model.MenuTypeImage;
 import com.nunoneto.assicanti.model.WeekMenu;
 import com.nunoneto.assicanti.model.Type;
 
@@ -12,7 +14,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,8 +64,8 @@ public class WebScrapper {
     public WeekMenu getMenus(){
         WeekMenu weekMenu = null;
 
-        //Check if already in realm
-        weekMenu = getWeekMenusFromPersistence();
+        //Check if menu already in realm
+        weekMenu = DataModel.getInstance().getCurrentMenu();
         if(weekMenu != null)
             return weekMenu;
 
@@ -106,6 +112,15 @@ public class WebScrapper {
             MenuType menuType = realm.createObject(MenuType.class);
             menuType.setType(type);
             weekMenu.getTypes().add(menuType);
+            MenuTypeImage menuTypeImage = imageExists(type);
+            if(menuTypeImage == null){
+                menuTypeImage = realm.createObject(MenuTypeImage.class);
+                menuTypeImage.setMenuType(type.toUpperCase());
+
+                String src = el.select(".wppizza-article-img > img").first().absUrl("src");;
+                menuTypeImage.setImage(downloadImage(src));
+            }
+            menuType.setMenuTypeImage(menuTypeImage);
 
             // get each day menu
             if(type.equals(Type.FISH) || type.equals(Type.VEGAN)){
@@ -140,29 +155,43 @@ public class WebScrapper {
         return weekMenu;
     }
 
-    private WeekMenu getWeekMenusFromPersistence(){
+    private byte[] downloadImage(String src){
+        InputStream is = null;
+        ByteArrayOutputStream baos = null;
+        try {
+            URL url = new URL(src);
+            is = url.openStream();
+            baos = new ByteArrayOutputStream();
 
-        Calendar cal = Calendar.getInstance();
+            byte[] buffer = new byte[1024];
+            int length;
+            while((length = is.read(buffer))>0){
+                baos.write(buffer,0,length);
+            }
+            return baos.toByteArray();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if(is != null){
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(baos != null){
+                try {
+                    baos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        Log.e(TAG,"Couldnt read image from url "+src);
+        return null;
 
-        cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-        cal.add(Calendar.DAY_OF_YEAR,-1);
-        cal.set(Calendar.HOUR_OF_DAY,0);
-        cal.set(Calendar.MINUTE,0);
-        cal.set(Calendar.SECOND,0);
-        Date startDate = cal.getTime();
-
-        cal.add(Calendar.DAY_OF_YEAR,1);
-        cal.set(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
-        Date endDate = cal.getTime();
-
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<WeekMenu> results = realm.where(WeekMenu.class)
-                .greaterThanOrEqualTo("starting",startDate)
-                .lessThanOrEqualTo("ending",endDate)
-                .findAll();
-        WeekMenu menus = results != null && results.size() > 0 ? realm.copyFromRealm(results).get(0) : null;
-        realm.close();
-        return menus;
     }
 
     /**
@@ -246,6 +275,15 @@ public class WebScrapper {
                 menuType.getDays().add(dayMenu);
             }
         }
+
+    }
+
+    private MenuTypeImage imageExists(String menuType){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<MenuTypeImage> images = realm.where(MenuTypeImage.class)
+                .equalTo("menuType",menuType.toUpperCase())
+                .findAll();
+        return images != null && images.size() > 0 ? images.get(0) : null;
 
     }
 

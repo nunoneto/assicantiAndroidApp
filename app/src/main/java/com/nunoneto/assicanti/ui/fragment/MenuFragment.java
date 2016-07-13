@@ -1,22 +1,43 @@
 package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.nunoneto.assicanti.R;
+import com.nunoneto.assicanti.Utils;
+import com.nunoneto.assicanti.model.DataModel;
+import com.nunoneto.assicanti.model.DayMenu;
+import com.nunoneto.assicanti.model.MenuType;
 import com.nunoneto.assicanti.model.WeekMenu;
+import com.nunoneto.assicanti.tasks.GetMenusTask;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
+
+import org.w3c.dom.Text;
+
+import java.util.Calendar;
 
 public class MenuFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-
     private final static String TAG = "FRAG_MENUS";
+
+    //Tasks
+    private GetMenusTask getMenusTask;
+
+    // Views
+    private LinearLayout scrollView;
 
     public MenuFragment() {
     }
@@ -25,22 +46,18 @@ public class MenuFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                WeekMenu menus = WebScrapper.getInstance().getMenus();
-
-            }
-        }).start();
-
-        showLoading();
+        getMenusTask = new GetMenusTask(MenuFragment.this);
+        getMenusTask.execute();
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_menu, container, false);
+
+        View root = inflater.inflate(R.layout.fragment_menu, container, false);
+        scrollView = (LinearLayout)root.findViewById(R.id.menuContainer);
+        return root;
     }
 
 
@@ -61,16 +78,59 @@ public class MenuFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        getMenusTask.cancel(true);
+    }
+
     public interface OnFragmentInteractionListener {
 
     }
 
-    private void showLoading(){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container,LoadingFragment.newInstance())
-                .addToBackStack(null)
-                .commit();
+    public void toggleLoading(){
+
+        Fragment loadingFrag = getActivity().getSupportFragmentManager().findFragmentByTag("LOADING");
+        if(loadingFrag != null){
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(loadingFrag)
+                    .commit();
+        }else{
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container,LoadingFragment.newInstance(),"LOADING")
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
+    public void loadWeekMenu(){
+        WeekMenu menu = DataModel.getInstance().getCurrentMenu();
+        Calendar cal = Utils.getCalendar();
+
+        LayoutInflater inflater = LayoutInflater.from(getActivity().getApplicationContext());
+
+        for(MenuType menuType : menu.getTypes()){
+            for(DayMenu dayMenu : menuType.getDays()){
+                if(dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
+
+                    CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
+                    card.setId(View.generateViewId());
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(menuType.getMenuTypeImage().getImage(),0,menuType.getMenuTypeImage().getImage().length);
+                    ((ImageView)card.findViewById(R.id.imageMenuType)).setImageBitmap(bitmap);
+                    ((TextView)card.findViewById(R.id.menuType)).setText(dayMenu.getType());
+                    ((TextView)card.findViewById(R.id.menuDescription)).setText(dayMenu.getDescription());
+
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    scrollView.addView(card,params);
+
+                }
+            }
+        }
+
     }
 
 }
+
+

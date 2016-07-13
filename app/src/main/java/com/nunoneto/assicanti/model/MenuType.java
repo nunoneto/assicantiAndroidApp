@@ -10,6 +10,7 @@ public class MenuType extends RealmObject{
 
     private String type; //meat, fish, ...
     private RealmList<DayMenu> days = new RealmList<>();
+    private MenuTypeImage menuTypeImage;
 
     public MenuType(){}
 
@@ -27,5 +28,13 @@ public class MenuType extends RealmObject{
 
     public void setDays(RealmList<DayMenu> days) {
         this.days = days;
+    }
+
+    public MenuTypeImage getMenuTypeImage() {
+        return menuTypeImage;
+    }
+
+    public void setMenuTypeImage(MenuTypeImage menuTypeImage) {
+        this.menuTypeImage = menuTypeImage;
     }
 }
