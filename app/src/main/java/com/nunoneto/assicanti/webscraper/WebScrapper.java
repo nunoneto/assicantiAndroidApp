@@ -6,6 +6,7 @@ import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.DayMenu;
 import com.nunoneto.assicanti.model.MenuType;
 import com.nunoneto.assicanti.model.MenuTypeImage;
+import com.nunoneto.assicanti.model.Price;
 import com.nunoneto.assicanti.model.WeekMenu;
 import com.nunoneto.assicanti.model.Type;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -92,6 +94,7 @@ public class WebScrapper {
             Elements menus = info.select("p");
             Element date = info.select("p").first();
             Elements dates = date.select("strong,b");
+            Elements prices = el.select(".wppizza-article-tiers > .wppizza-article-price");
 
             if(weekMenu == null){
                 Date start = null,
@@ -121,7 +124,19 @@ public class WebScrapper {
                 menuTypeImage.setImage(downloadImage(src));
             }
             menuType.setMenuTypeImage(menuTypeImage);
-
+            //price
+            for(Element priceEl : prices){
+                Price price = realm.createObject(Price.class);
+                Number num = null;
+                try {
+                    num = NumberFormat.getInstance().parse(priceEl.select("span > span").first().text());
+                    price.setPrice(num.doubleValue());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                price.setType(priceEl.select(".wppizza-article-price-lbl").first().text());
+                menuType.getPrices().add(price);
+            }
             // get each day menu
             if(type.equals(Type.FISH) || type.equals(Type.VEGAN)){
                 parseMeatFish(menus, menuType, type);

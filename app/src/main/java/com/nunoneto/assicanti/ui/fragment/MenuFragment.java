@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.nunoneto.assicanti.model.DayMenu;
 import com.nunoneto.assicanti.model.MenuType;
 import com.nunoneto.assicanti.model.WeekMenu;
 import com.nunoneto.assicanti.tasks.GetMenusTask;
+import com.nunoneto.assicanti.ui.adapters.PriceSpinnerAdapter;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 import org.w3c.dom.Text;
@@ -121,6 +123,9 @@ public class MenuFragment extends Fragment {
                     ((ImageView)card.findViewById(R.id.imageMenuType)).setImageBitmap(bitmap);
                     ((TextView)card.findViewById(R.id.menuType)).setText(dayMenu.getType());
                     ((TextView)card.findViewById(R.id.menuDescription)).setText(dayMenu.getDescription());
+
+                    PriceSpinnerAdapter adapter = new PriceSpinnerAdapter(getActivity(),R.layout.spinner_price,menuType.getPrices());
+                    ((AppCompatSpinner)card.findViewById(R.id.priceSpinner)).setAdapter(adapter);
 
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                     scrollView.addView(card,params);
