@@ -120,7 +120,8 @@ public class WebScrapper {
                     if(!menu.text().equals(date.text())){
                         int dayOfWeek = parseWeekDay(menu.select("p > strong").text());
                         menu.select("p").remove();
-                        String description = menu.text();
+                        menu.select("strong").remove();
+                        String description = menu.select("p").text().replace("• ","");
 
                         DayMenu dayMenu = realm.createObject(DayMenu.class);
                         dayMenu.setDayOfWeek(dayOfWeek);
@@ -144,15 +145,12 @@ public class WebScrapper {
         Calendar cal = Calendar.getInstance();
 
         cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-        cal.set(Calendar.HOUR,0);
+        cal.set(Calendar.HOUR_OF_DAY,0);
         cal.set(Calendar.MINUTE,0);
         cal.set(Calendar.SECOND,0);
         Date startDate = cal.getTime();
 
         cal.set(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
-        cal.set(Calendar.HOUR,23);
-        cal.set(Calendar.MINUTE,59);
-        cal.set(Calendar.SECOND,59);
         Date endDate = cal.getTime();
 
         Realm realm = Realm.getDefaultInstance();
@@ -219,7 +217,8 @@ public class WebScrapper {
         Element firstDay = menu.select("p").get(1);
         int dayOfWeek = parseWeekDay(firstDay.select("p > strong").first().text());
         firstDay.select("p").remove();
-        String description = menu.text();
+        firstDay.select("strong").remove();
+        String description = firstDay.select("p").text().replace("• ","");
 
         DayMenu dayMenu = realm.createObject(DayMenu.class);
         dayMenu.setDayOfWeek(dayOfWeek);
@@ -235,7 +234,8 @@ public class WebScrapper {
 
                 dayOfWeek = parseWeekDay(dayText);
                 thisDay.select("p").remove();
-                description = thisDay.text();
+                thisDay.select("strong").remove();
+                description = thisDay.text().replace("• ","");
 
                 dayMenu = realm.createObject(DayMenu.class);
                 dayMenu.setDayOfWeek(dayOfWeek);

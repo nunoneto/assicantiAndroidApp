@@ -23,20 +23,32 @@ public class DayMenu extends RealmObject {
         this.description = description;
     }
 
-    public RealmList<DayMenu> getDays() {
-        return days;
+    public int getDayOfWeek() {
+        return dayOfWeek;
     }
 
     public void setDayOfWeek(int dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public void setType(String type) {
         this.type = type;
+    }
+
+    public RealmList<DayMenu> getDays() {
+        return days;
     }
 
     public void setDays(RealmList<DayMenu> days) {

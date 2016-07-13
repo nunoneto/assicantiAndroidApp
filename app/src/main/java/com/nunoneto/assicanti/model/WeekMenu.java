@@ -56,4 +56,20 @@ public class WeekMenu extends RealmObject {
     public void setTypes(RealmList<MenuType> types) {
         this.types = types;
     }
+
+    public String getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(String menuId) {
+        this.menuId = menuId;
+    }
+
+    public Date getStarting() {
+        return starting;
+    }
+
+    public Date getEnding() {
+        return ending;
+    }
 }

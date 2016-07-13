@@ -9,38 +9,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.WeekMenu;
-import com.nunoneto.assicanti.webscraper.WebScrapper;
 
-public class MenuFragment extends Fragment {
+public class LoadingFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private final static String TAG = "FRAG_MENUS";
+    public LoadingFragment() {
+        // Required empty public constructor
+    }
 
-    public MenuFragment() {
+    public static LoadingFragment newInstance() {
+        return new LoadingFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                WeekMenu menus = WebScrapper.getInstance().getMenus();
-
-            }
-        }).start();
-
-        showLoading();
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_menu, container, false);
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_loading, container, false);
     }
 
 
@@ -64,13 +55,4 @@ public class MenuFragment extends Fragment {
     public interface OnFragmentInteractionListener {
 
     }
-
-    private void showLoading(){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container,LoadingFragment.newInstance())
-                .addToBackStack(null)
-                .commit();
-    }
-
 }

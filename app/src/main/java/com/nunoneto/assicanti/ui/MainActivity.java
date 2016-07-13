@@ -15,12 +15,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nunoneto.assicanti.R;
+import com.nunoneto.assicanti.ui.fragment.LoadingFragment;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MenuFragment.OnFragmentInteractionListener{
+        MenuFragment.OnFragmentInteractionListener,
+        LoadingFragment.OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +49,21 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        showMenus();
+    }
+
+    private void showMenus(){
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container,new MenuFragment())
+                .commit();
+    }
+
+    private void showLoading(){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.container,LoadingFragment.newInstance())
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -72,12 +86,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -110,9 +120,4 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 }
