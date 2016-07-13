@@ -7,6 +7,7 @@ import java.util.Date;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
 /**
  * Created by NB20301 on 12/07/2016.
@@ -25,6 +26,7 @@ public class WeekMenu extends RealmObject {
 
     @PrimaryKey
     private String menuId;
+    @Required
     private Date starting, ending;
     private RealmList<MenuType> types = new RealmList<>();
 

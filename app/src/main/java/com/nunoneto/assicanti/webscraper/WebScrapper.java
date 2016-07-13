@@ -145,18 +145,20 @@ public class WebScrapper {
         Calendar cal = Calendar.getInstance();
 
         cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+        cal.add(Calendar.DAY_OF_YEAR,-1);
         cal.set(Calendar.HOUR_OF_DAY,0);
         cal.set(Calendar.MINUTE,0);
         cal.set(Calendar.SECOND,0);
         Date startDate = cal.getTime();
 
-        cal.set(Calendar.DAY_OF_WEEK,Calendar.FRIDAY);
+        cal.add(Calendar.DAY_OF_YEAR,1);
+        cal.set(Calendar.DAY_OF_WEEK,Calendar.SATURDAY);
         Date endDate = cal.getTime();
 
         Realm realm = Realm.getDefaultInstance();
         RealmResults<WeekMenu> results = realm.where(WeekMenu.class)
-                .equalTo("starting",startDate)
-                .equalTo("ending",endDate)
+                .greaterThanOrEqualTo("starting",startDate)
+                .lessThanOrEqualTo("ending",endDate)
                 .findAll();
         WeekMenu menus = results != null && results.size() > 0 ? realm.copyFromRealm(results).get(0) : null;
         realm.close();
