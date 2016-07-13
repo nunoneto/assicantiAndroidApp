@@ -10,6 +10,7 @@ import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -119,9 +120,9 @@ public class MenuFragment extends Fragment {
 
         LayoutInflater inflater = LayoutInflater.from(getActivity().getApplicationContext());
 
-        for(MenuType menuType : menu.getTypes()){
-            for(DayMenu dayMenu : menuType.getDays()){
-                if(dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
+        for(final MenuType menuType : menu.getTypes()){
+            for(final DayMenu dayMenu : menuType.getDays()){
+                if( dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
 
                     CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
                     card.setId(View.generateViewId());
@@ -132,6 +133,13 @@ public class MenuFragment extends Fragment {
                     ((ImageView)card.findViewById(R.id.imageMenuType)).setImageBitmap(bitmap);
                     ((TextView)card.findViewById(R.id.menuType)).setText(dayMenu.getType());
                     ((TextView)card.findViewById(R.id.menuDescription)).setText(dayMenu.getDescription());
+
+                    card.findViewById(R.id.orderMenu).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            
+                        }
+                    });
 
                     PriceSpinnerAdapter adapter = new PriceSpinnerAdapter(
                             getActivity().getApplicationContext(),
