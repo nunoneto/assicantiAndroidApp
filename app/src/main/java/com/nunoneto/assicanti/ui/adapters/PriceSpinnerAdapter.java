@@ -1,14 +1,16 @@
 package com.nunoneto.assicanti.ui.adapters;
 
+import com.nunoneto.assicanti.R;
+import com.nunoneto.assicanti.model.Price;
+
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.Price;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,8 +62,9 @@ public class PriceSpinnerAdapter extends ArrayAdapter<Price> {
     }
 
     @Override
-    public View getDropDownView(int position, View convertView,ViewGroup parent) {
-        return getCustomView(position, convertView, parent);
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        View v =  getCustomView(position, convertView, parent);
+        return v;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class PriceSpinnerAdapter extends ArrayAdapter<Price> {
 
         Price p = prices.get(position);
 
-        price.setText(p.getPrice()+"");
+        price.setText(p.getPrice() + "");
         priceType.setText(p.getType());
 
         return row;
