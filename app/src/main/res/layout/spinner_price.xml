@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
      android:layout_width="match_parent"
-    android:layout_height="30dp">
+    android:layout_height="50dp"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/priceType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:layout_centerVertical="true"
         android:text="Mini"/>
 
@@ -18,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:text="4,00 €"/>
 
 </RelativeLayout>

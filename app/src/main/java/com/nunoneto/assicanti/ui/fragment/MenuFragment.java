@@ -3,8 +3,10 @@ package com.nunoneto.assicanti.ui.fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -46,6 +48,7 @@ public class MenuFragment extends Fragment {
     private GetMenusTask getMenusTask;
 
     // Views
+    private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout scrollView;
 
     public MenuFragment() {
@@ -54,9 +57,8 @@ public class MenuFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getMenusTask = new GetMenusTask(MenuFragment.this);
-        getMenusTask.execute();
+        getMenusTask.execute(false);
 
     }
 
@@ -66,6 +68,20 @@ public class MenuFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_menu, container, false);
         scrollView = (LinearLayout)root.findViewById(R.id.menuContainer);
+        swipeRefreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if(getMenusTask.getStatus() == AsyncTask.Status.PENDING || getMenusTask.getStatus() == AsyncTask.Status.RUNNING)
+                    swipeRefreshLayout.setRefreshing(false);
+                else{
+                    getMenusTask = new GetMenusTask(MenuFragment.this);
+                    getMenusTask.execute(true);
+                }
+            }
+        });
+
         return root;
     }
 
@@ -120,6 +136,10 @@ public class MenuFragment extends Fragment {
 
         LayoutInflater inflater = LayoutInflater.from(getActivity().getApplicationContext());
 
+        if(scrollView.getChildCount() > 0){
+            scrollView.removeAllViews();
+        }
+
         for(final MenuType menuType : menu.getTypes()){
             for(final DayMenu dayMenu : menuType.getDays()){
                 if( dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
@@ -137,7 +157,7 @@ public class MenuFragment extends Fragment {
                     card.findViewById(R.id.orderMenu).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            
+
                         }
                     });
 
@@ -156,6 +176,9 @@ public class MenuFragment extends Fragment {
                 }
             }
         }
+
+        if(swipeRefreshLayout.isRefreshing())
+            swipeRefreshLayout.setRefreshing(false);
 
     }
 

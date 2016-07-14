@@ -10,8 +10,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="5dp">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/imageMenuType"
@@ -35,15 +34,15 @@
             android:layout_height="wrap_content"
             android:text="Pataniscas de Bisconte com arroz de cabidela"
             android:textSize="16sp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_below="@id/imageMenuType"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:layout_below="@id/menuDescription"
             android:weightSum="10">
 
@@ -54,9 +53,9 @@
                 android:layout_below="@id/menuDescription"
                 android:spinnerMode="dropdown"
                 android:layout_weight="7"
+                android:paddingLeft="10dp"
                 android:paddingRight="20dp"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin">
-
+                android:popupBackground="#d6d7d7">
             </android.support.v7.widget.AppCompatSpinner>
 
             <Button
@@ -64,9 +63,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Encomendar"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:padding="0dp"
                 android:layout_weight="3"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/menuDescription"/>
 

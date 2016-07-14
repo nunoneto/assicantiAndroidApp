@@ -63,13 +63,18 @@ public class WebScrapper {
     /**
      * Parses menu page in order to get the menu information
      */
-    public WeekMenu getMenus(){
+    public WeekMenu getMenus(boolean forceUpdate){
         WeekMenu weekMenu = null;
 
-        //Check if menu already in realm
-        weekMenu = DataModel.getInstance().getCurrentMenu();
-        if(weekMenu != null)
-            return weekMenu;
+
+        if(forceUpdate){
+            DataModel.getInstance().deleteCurrentMenu();
+        }else{
+            //Check if menu already in realm
+            weekMenu = DataModel.getInstance().getCurrentMenu();
+            if(weekMenu != null)
+                return weekMenu;
+        }
 
         //Get document if not in memory
         if(menuPage == null)
@@ -135,6 +140,7 @@ public class WebScrapper {
                     e.printStackTrace();
                 }
                 price.setType(priceEl.select(".wppizza-article-price-lbl").first().text());
+                price.setCurrency(priceEl.parent().select(".wppizza-article-price-currency").first().text().trim());
                 menuType.getPrices().add(price);
             }
             // get each day menu

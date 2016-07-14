@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
@@ -31,7 +32,22 @@ public class DataModel {
     }
 
     public WeekMenu getCurrentMenu() {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<WeekMenu> results = getCurrentMenuQuery().findAll();
+        WeekMenu menus = results != null && results.size() > 0 ? realm.copyFromRealm(results).get(0) : null;
+        realm.close();
+        return menus;
+    }
 
+    public void deleteCurrentMenu(){
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        getCurrentMenuQuery().findAll().deleteFromRealm(0);
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    private RealmQuery<WeekMenu> getCurrentMenuQuery(){
         Calendar cal = Utils.getCalendar();
 
         cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
@@ -46,16 +62,9 @@ public class DataModel {
         Date endDate = cal.getTime();
 
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<WeekMenu> results = realm.where(WeekMenu.class)
+        return realm.where(WeekMenu.class)
                 .greaterThanOrEqualTo("starting",startDate)
-                .lessThanOrEqualTo("ending",endDate)
-                .findAll();
-        WeekMenu menus = results != null && results.size() > 0 ? realm.copyFromRealm(results).get(0) : null;
-        realm.close();
-        return menus;
-
-
-
+                .lessThanOrEqualTo("ending",endDate);
     }
 
 }

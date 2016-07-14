@@ -10,7 +10,7 @@ import com.nunoneto.assicanti.webscraper.WebScrapper;
 /**
  * Created by NB20301 on 13/07/2016.
  */
-public class GetMenusTask extends AsyncTask<Void,Void,Void> {
+public class GetMenusTask extends AsyncTask<Boolean,Void,Void> {
 
     private MenuFragment menuFragment;
 
@@ -18,9 +18,10 @@ public class GetMenusTask extends AsyncTask<Void,Void,Void> {
         this.menuFragment = menuFragment;
     }
 
+
     @Override
-    protected Void doInBackground(Void... voids) {
-        WebScrapper.getInstance().getMenus();
+    protected Void doInBackground(Boolean... forceUpdate) {
+        WebScrapper.getInstance().getMenus(forceUpdate[0]);
         return null;
     }
 

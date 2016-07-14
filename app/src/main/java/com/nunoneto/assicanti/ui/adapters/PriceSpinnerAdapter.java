@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -81,7 +82,8 @@ public class PriceSpinnerAdapter extends ArrayAdapter<Price> {
 
         Price p = prices.get(position);
 
-        price.setText(p.getPrice() + "");
+        DecimalFormat df = new DecimalFormat("#.00");
+        price.setText( df.format(p.getPrice())+" "+ p.getCurrency());
         priceType.setText(p.getType());
 
         return row;
