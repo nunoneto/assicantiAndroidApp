@@ -6,26 +6,19 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.Utils;
 import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.OptionalGroup;
-import com.nunoneto.assicanti.network.GetOptionalsRequest;
+import com.nunoneto.assicanti.network.RequestConstants;
 import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.network.response.GetOptionalsResponse;
 import com.nunoneto.assicanti.tasks.GetOptionalsTask;
-import com.nunoneto.assicanti.ui.adapters.OptionalsListAdapter;
 import com.nunoneto.assicanti.ui.adapters.OptionalsPagerAdapter;
 
 import java.util.ArrayList;
@@ -81,7 +74,7 @@ public class OptionalsFragment extends BaseFragment implements Callback<GetOptio
 
     private void getOptionals(){
         RestService.getInstance().getAssicantiService()
-                .getOptionals(GetOptionalsRequest.ACTION, GetOptionalsRequest.TYPE,itemId,tier,size)
+                .getOptionals(RequestConstants.GetIngredients.ACTION, RequestConstants.GetIngredients.TYPE,itemId,tier,size)
                 .enqueue(this);
     }
 
@@ -111,7 +104,7 @@ public class OptionalsFragment extends BaseFragment implements Callback<GetOptio
                     .setContentDescription(group.getName());
             tabLayout.addTab(tab);
 
-            ListOptionalsFragment frag = ListOptionalsFragment.newInstance(i);
+            ListOptionalsFragment frag = ListOptionalsFragment.newInstance(i,itemId);
             fragments.add(frag);
             tabTitles[i] = group.getName();
         }

@@ -68,7 +68,6 @@ public class WebScrapper {
     public WeekMenu getMenus(boolean forceUpdate){
         WeekMenu weekMenu = null;
 
-
         if(forceUpdate){
             DataModel.getInstance().deleteCurrentMenu();
         }else{

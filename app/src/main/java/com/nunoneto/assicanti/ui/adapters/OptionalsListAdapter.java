@@ -37,7 +37,7 @@ public class OptionalsListAdapter extends RecyclerView.Adapter<OptionalsListAdap
     }
 
     public interface OptionalItemClickListener{
-        void onItemChecked(boolean checked, OptionalItem item);
+        void onItemChecked(boolean checked, OptionalItem item, CompoundButton compoundButton);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class OptionalsListAdapter extends RecyclerView.Adapter<OptionalsListAdap
         holder.appCompatCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                listener.onItemChecked(b,OptionalsListAdapter.this.optionalItemList.get(position));
+                listener.onItemChecked(b,OptionalsListAdapter.this.optionalItemList.get(position),compoundButton);
             }
         });
     }

@@ -1,30 +1,37 @@
 package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.CompoundButton;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.OptionalGroup;
 import com.nunoneto.assicanti.model.OptionalItem;
+import com.nunoneto.assicanti.network.RequestConstants;
+import com.nunoneto.assicanti.network.RestService;
+import com.nunoneto.assicanti.network.response.AddOptionalResponse;
 import com.nunoneto.assicanti.ui.adapters.OptionalsListAdapter;
 
-public class ListOptionalsFragment extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ListOptionalsFragment extends BaseFragment {
     private OnFragmentInteractionListener mListener;
 
     private static final String TAG = "LISTOPTIONALS_FRAG";
     private static final String PARAM_POSITION = "POSITION";
+    private static final String PARAM_GROUP_ID = "GROUP_ID";
 
     private int position;
+    private String groupId;
 
     // Views
     private RecyclerView optionalsRecyclerView;
@@ -32,10 +39,11 @@ public class ListOptionalsFragment extends Fragment {
     public ListOptionalsFragment() {
     }
 
-    public static ListOptionalsFragment newInstance(int position) {
+    public static ListOptionalsFragment newInstance(int position, String groupId) {
         ListOptionalsFragment fragment = new ListOptionalsFragment();
         Bundle b = new Bundle();
         b.putInt(PARAM_POSITION,position);
+        b.putString(PARAM_GROUP_ID,groupId);
         fragment.setArguments(b);
         return fragment;
     }
@@ -45,6 +53,7 @@ public class ListOptionalsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if(getArguments() != null){
             position = getArguments().getInt(PARAM_POSITION);
+            groupId = getArguments().getString(PARAM_GROUP_ID);
         }
     }
 
@@ -65,14 +74,44 @@ public class ListOptionalsFragment extends Fragment {
                 DataModel.getInstance().getOptionalGroups().get(position).getItems(),
                 new OptionalsListAdapter.OptionalItemClickListener() {
                     @Override
-                    public void onItemChecked(boolean checked, OptionalItem item) {
-                        Toast.makeText(getContext(),"Click with state"+(checked? "on":"off")+" in "+item.getName(),Toast.LENGTH_LONG).show();
+                    public void onItemChecked(boolean checked, OptionalItem item, CompoundButton compoundButton) {
+                        addRemoveIngredient(item,compoundButton, checked);
                     }
                 }
         ));
     }
 
-    private void addIngredient(){
+    private void addRemoveIngredient(OptionalItem item, final CompoundButton compoundButton,boolean checked ){
+        toggleLoading();
+        compoundButton.setEnabled(false);
+        RestService.getInstance().getAssicantiService()
+                .addRemoveOptional(
+                        checked ? RequestConstants.AddIngredients.ACTION : RequestConstants.RemoveIngredients.ACTION,
+                        checked ? RequestConstants.AddIngredients.TYPE : RequestConstants.RemoveIngredients.TYPE,
+                        item.getItemId(),
+                        groupId,
+                        item.getMultiId(),
+                        item.getMultiType()
+                ).enqueue(new Callback<AddOptionalResponse>() {
+            @Override
+            public void onResponse(Call<AddOptionalResponse> call, Response<AddOptionalResponse> response) {
+                Snackbar.make(getView(),"Opcional adicionado!",Snackbar.LENGTH_SHORT).show();
+                compoundButton.setEnabled(true);
+                toggleLoading();
+            }
+
+            @Override
+            public void onFailure(Call<AddOptionalResponse> call, Throwable t) {
+                Log.e(TAG,"Failed to get ingredients with reason:");
+                t.printStackTrace();
+                Snackbar.make(getView(),"Não foi adicionar o opcional",Snackbar.LENGTH_LONG).show();
+                compoundButton.setChecked(false);
+                compoundButton.setEnabled(true);
+                toggleLoading();
+            }
+        });
+
+
 
     }
 
