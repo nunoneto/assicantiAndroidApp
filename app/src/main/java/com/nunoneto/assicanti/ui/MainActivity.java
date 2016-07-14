@@ -15,14 +15,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nunoneto.assicanti.R;
+import com.nunoneto.assicanti.model.Price;
+import com.nunoneto.assicanti.ui.fragment.ListOptionalsFragment;
 import com.nunoneto.assicanti.ui.fragment.LoadingFragment;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
+import com.nunoneto.assicanti.ui.fragment.OptionalsFragment;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MenuFragment.OnFragmentInteractionListener,
-        LoadingFragment.OnFragmentInteractionListener{
+        LoadingFragment.OnFragmentInteractionListener,
+        OptionalsFragment.OnFragmentInteractionListener,
+        ListOptionalsFragment.OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,8 @@ public class MainActivity extends AppCompatActivity
     private void showMenus(){
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.container,new MenuFragment())
+                .add(R.id.container,new MenuFragment(),"MENU")
+                .addToBackStack("MENU")
                 .commit();
     }
 
@@ -103,4 +109,12 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void showOptionals(Price price) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier()))
+                .addToBackStack("OPTIONALS")
+                .commit();
+    }
 }

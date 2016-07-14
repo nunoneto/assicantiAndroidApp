@@ -39,7 +39,7 @@ import java.util.List;
 
 import io.realm.Realm;
 
-public class MenuFragment extends Fragment {
+public class MenuFragment extends BaseFragment {
 
     private OnFragmentInteractionListener mListener;
     private final static String TAG = "FRAG_MENUS";
@@ -111,23 +111,7 @@ public class MenuFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
 
-    }
-
-    public void toggleLoading(){
-
-        Fragment loadingFrag = getActivity().getSupportFragmentManager().findFragmentByTag("LOADING");
-        if(loadingFrag != null){
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .remove(loadingFrag)
-                    .commit();
-        }else{
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.container,LoadingFragment.newInstance(),"LOADING")
-                    .addToBackStack(null)
-                    .commit();
-        }
+        void showOptionals(Price price);
     }
 
     public void loadWeekMenu(){
@@ -140,8 +124,8 @@ public class MenuFragment extends Fragment {
             scrollView.removeAllViews();
         }
 
-        for(final MenuType menuType : menu.getTypes()){
-            for(final DayMenu dayMenu : menuType.getDays()){
+        for(MenuType menuType : menu.getTypes()){
+            for(DayMenu dayMenu : menuType.getDays()){
                 if( dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
 
                     CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
@@ -154,19 +138,21 @@ public class MenuFragment extends Fragment {
                     ((TextView)card.findViewById(R.id.menuType)).setText(dayMenu.getType());
                     ((TextView)card.findViewById(R.id.menuDescription)).setText(dayMenu.getDescription());
 
-                    card.findViewById(R.id.orderMenu).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                        }
-                    });
-
                     PriceSpinnerAdapter adapter = new PriceSpinnerAdapter(
                             getActivity().getApplicationContext(),
                             R.layout.spinner_price,
                             menuType.getPrices()
                     );
-                    ((AppCompatSpinner)card.findViewById(R.id.priceSpinner)).setAdapter(adapter);
+                    final AppCompatSpinner appCompatSpinner = ((AppCompatSpinner)card.findViewById(R.id.priceSpinner));
+                    appCompatSpinner.setAdapter(adapter);
+
+                    card.findViewById(R.id.orderMenu).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Price price = (Price)appCompatSpinner.getSelectedItem();
+                            MenuFragment.this.mListener.showOptionals(price);
+                        }
+                    });
 
                     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                     int margin = Utils.dpToPx(8,getContext());

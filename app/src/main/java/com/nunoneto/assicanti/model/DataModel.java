@@ -18,17 +18,12 @@ public class DataModel {
     private static DataModel instance;
 
     private List<WeekMenu> menus;
+    private List<OptionalGroup> optionalGroups;
+
+
 
     public static DataModel getInstance() {
-        return instance != null ? instance : new DataModel();
-    }
-
-    public List<WeekMenu> getMenus() {
-        return menus;
-    }
-
-    public void setMenus(List<WeekMenu> menus) {
-        this.menus = menus;
+        return instance != null ? instance : (instance = new DataModel());
     }
 
     public WeekMenu getCurrentMenu() {
@@ -67,4 +62,11 @@ public class DataModel {
                 .lessThanOrEqualTo("ending",endDate);
     }
 
+    public List<OptionalGroup> getOptionalGroups() {
+        return optionalGroups;
+    }
+
+    public void setOptionalGroups(List<OptionalGroup> optionalGroups) {
+        this.optionalGroups = optionalGroups;
+    }
 }

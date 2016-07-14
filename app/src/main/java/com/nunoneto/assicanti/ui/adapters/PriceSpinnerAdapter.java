@@ -73,7 +73,6 @@ public class PriceSpinnerAdapter extends ArrayAdapter<Price> {
         return getCustomView(position, convertView, parent);
     }
 
-    // This funtion called for each row ( Called data.size() times )
     public View getCustomView(int position, View convertView, ViewGroup parent) {
         View row = LayoutInflater.from(context).inflate(R.layout.spinner_price, parent, false);
 

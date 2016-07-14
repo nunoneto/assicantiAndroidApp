@@ -10,6 +10,9 @@ public class Price extends RealmObject {
     private String type;
     private String currency;
     private double price;
+    // request props
+    private String itemId, tier, size;
+
 
     public Price() {
     }
@@ -36,5 +39,29 @@ public class Price extends RealmObject {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getTier() {
+        return tier;
+    }
+
+    public void setTier(String tier) {
+        this.tier = tier;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 }

@@ -6,6 +6,8 @@ import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.DayMenu;
 import com.nunoneto.assicanti.model.MenuType;
 import com.nunoneto.assicanti.model.MenuTypeImage;
+import com.nunoneto.assicanti.model.OptionalGroup;
+import com.nunoneto.assicanti.model.OptionalItem;
 import com.nunoneto.assicanti.model.Price;
 import com.nunoneto.assicanti.model.WeekMenu;
 import com.nunoneto.assicanti.model.Type;
@@ -47,7 +49,7 @@ public class WebScrapper {
     private Document menuPage;
 
     public static WebScrapper getInstance() {
-        return instance != null ? instance : new WebScrapper();
+        return instance != null ? instance : (instance = new WebScrapper());
     }
 
 
@@ -141,6 +143,10 @@ public class WebScrapper {
                 }
                 price.setType(priceEl.select(".wppizza-article-price-lbl").first().text());
                 price.setCurrency(priceEl.parent().select(".wppizza-article-price-currency").first().text().trim());
+                String[] id = priceEl.id().split("-");
+                price.setItemId(id[1]);
+                price.setTier(id[2]);
+                price.setSize(id[3]);
                 menuType.getPrices().add(price);
             }
             // get each day menu
@@ -174,6 +180,36 @@ public class WebScrapper {
         realm.close();
 
         return weekMenu;
+    }
+
+    public List<OptionalGroup> parseOptionals(String html){
+
+        List<OptionalGroup> groups = new ArrayList<>();
+        Document doc = Jsoup.parse(html);
+        Elements optGroups = doc.select(".wppizza-imulti > fieldset.wppizza-list-ingredients");
+        for(Element opt : optGroups){
+
+            OptionalGroup group = new OptionalGroup();
+            group.setName(opt.select("legend").first().text());
+
+            Elements items = opt.select("ul > li");
+            for (Element item : items){
+
+                String[] id = item.id().split("-");
+
+                OptionalItem optional = new OptionalItem(
+                        item.select("label.wppizza-doingredient-lbl").first().text(),
+                        id[3],
+                        id[5],
+                        id[2],
+                        id[4]
+                );
+                group.getItems().add(optional);
+
+            }
+            groups.add(group);
+        }
+        return groups;
     }
 
     private byte[] downloadImage(String src){
