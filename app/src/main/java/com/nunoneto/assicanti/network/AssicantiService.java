@@ -1,6 +1,8 @@
 package com.nunoneto.assicanti.network;
 
 import com.nunoneto.assicanti.network.response.AddOptionalResponse;
+import com.nunoneto.assicanti.network.response.AddToCart1Response;
+import com.nunoneto.assicanti.network.response.AddToCart2Response;
 import com.nunoneto.assicanti.network.response.GetOptionalsResponse;
 import com.nunoneto.assicanti.tasks.GetOptionalsTask;
 
@@ -33,6 +35,26 @@ public interface AssicantiService {
             @Field("vars[postId]") String postId,
             @Field("vars[multiId]") String multiId,
             @Field("vars[multiType]") String multiType
+    );
+
+    @FormUrlEncoded
+    @POST("/wp-admin/admin-ajax.php")
+    Call<AddToCart1Response> addToCart1(
+            @Field("action") String action,
+            @Field("vars[type]") String type,
+            @Field("vars[multiType]") String multiType,
+            @Field("vars[data]") String data,
+            @Field("vars[catId]") String catId
+    );
+
+    @FormUrlEncoded
+    @POST("/wp-admin/admin-ajax.php")
+    Call<AddToCart2Response> addToCart2(
+            @Field("action") String action,
+            @Field("vars[type]") String type,
+            @Field("vars[id]") String id,
+            @Field("vars[itemCount]") String itemCount,
+            @Field("vars[catId]") String catId
     );
 
 

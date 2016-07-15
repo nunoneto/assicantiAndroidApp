@@ -32,6 +32,7 @@ public class RestService {
     private static RestService instance;
 
     private AssicantiService assicantiService;
+    final HashMap<HttpUrl,List<Cookie>> cookieStore = new HashMap<>();
 
     public static RestService getInstance(){
         return instance == null? (instance = new RestService()) : instance;
@@ -42,7 +43,6 @@ public class RestService {
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        final HashMap<HttpUrl,List<Cookie>> cookieStore = new HashMap<>();
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new StethoInterceptor())
@@ -71,5 +71,9 @@ public class RestService {
 
     public AssicantiService getAssicantiService() {
         return assicantiService;
+    }
+
+    public void clearCookies(){
+        this.cookieStore.clear();
     }
 }

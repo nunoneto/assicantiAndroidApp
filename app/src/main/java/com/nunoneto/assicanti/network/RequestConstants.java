@@ -24,6 +24,16 @@ public class RequestConstants {
         public static final String TYPE = "removeingredient";
     }
 
+    public class AddToCart1{
+        public static final String ACTION = "wppizza_ingredients_json";
+        public static final String TYPE = "diy-to-cart";
+    }
+
+    public class AddToCart2{
+        public static final String ACTION = "wppizza_json";
+        public static final String TYPE = "refresh";
+    }
+
 
 
 }

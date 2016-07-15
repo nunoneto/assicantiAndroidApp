@@ -146,6 +146,7 @@ public class WebScrapper {
                 price.setItemId(id[1]);
                 price.setTier(id[2]);
                 price.setSize(id[3]);
+                price.setId(priceEl.id());
                 menuType.getPrices().add(price);
             }
             // get each day menu
@@ -186,10 +187,14 @@ public class WebScrapper {
         List<OptionalGroup> groups = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements optGroups = doc.select(".wppizza-imulti > fieldset.wppizza-list-ingredients");
+
+        String multiType = doc.select("#wppizza-ingr-multitype").first().attr("value");
+
         for(Element opt : optGroups){
 
             OptionalGroup group = new OptionalGroup();
             group.setName(opt.select("legend").first().text());
+            group.setMultiType(multiType);
 
             Elements items = opt.select("ul > li");
             for (Element item : items){

@@ -7,6 +7,7 @@ import io.realm.RealmObject;
  */
 public class Price extends RealmObject {
 
+    private String id;
     private String type;
     private String currency;
     private double price;
@@ -63,5 +64,13 @@ public class Price extends RealmObject {
 
     public void setSize(String size) {
         this.size = size;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -22,7 +22,6 @@ public class GetOptionalsTask extends AsyncTask<String,Void,List<OptionalGroup>>
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        optionalsFragment.toggleLoading();
     }
 
     @Override
@@ -34,6 +33,5 @@ public class GetOptionalsTask extends AsyncTask<String,Void,List<OptionalGroup>>
     protected void onPostExecute(List<OptionalGroup> optionalGroups) {
         super.onPostExecute(optionalGroups);
         optionalsFragment.loadOptionals(optionalGroups);
-        optionalsFragment.toggleLoading();
     }
 }

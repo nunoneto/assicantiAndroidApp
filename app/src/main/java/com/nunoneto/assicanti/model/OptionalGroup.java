@@ -9,6 +9,7 @@ import java.util.List;
 public class OptionalGroup {
 
     private String name;
+    private String multiType;
     private List<OptionalItem> items = new ArrayList<>();
 
     public void setName(String name) {
@@ -25,5 +26,13 @@ public class OptionalGroup {
 
     public String getName() {
         return name;
+    }
+
+    public String getMultiType() {
+        return multiType;
+    }
+
+    public void setMultiType(String multiType) {
+        this.multiType = multiType;
     }
 }

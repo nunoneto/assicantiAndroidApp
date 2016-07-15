@@ -1,11 +1,8 @@
 package com.nunoneto.assicanti.ui;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -16,18 +13,13 @@ import android.view.MenuItem;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.Price;
-import com.nunoneto.assicanti.ui.fragment.ListOptionalsFragment;
-import com.nunoneto.assicanti.ui.fragment.LoadingFragment;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
+import com.nunoneto.assicanti.ui.fragment.OnFragmentInteractionListener;
 import com.nunoneto.assicanti.ui.fragment.OptionalsFragment;
-import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MenuFragment.OnFragmentInteractionListener,
-        LoadingFragment.OnFragmentInteractionListener,
-        OptionalsFragment.OnFragmentInteractionListener,
-        ListOptionalsFragment.OnFragmentInteractionListener{
+        OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,20 +38,19 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         showMenus();
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                FragmentManager.BackStackEntry entry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount()-1);
+            }
+        });
     }
 
     private void showMenus(){
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.container,new MenuFragment(),"MENU")
-                .addToBackStack("MENU")
-                .commit();
-    }
-
-    private void showLoading(){
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container,LoadingFragment.newInstance())
+                .add(R.id.container,new MenuFragment(),MenuFragment.NAME)
                 .addToBackStack(null)
                 .commit();
     }
@@ -109,12 +100,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     @Override
     public void showOptionals(Price price) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier()))
-                .addToBackStack("OPTIONALS")
+                .add(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier(),price.getId()))
+                .addToBackStack(null)
                 .commit();
     }
+
 }

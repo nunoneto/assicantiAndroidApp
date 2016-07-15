@@ -26,21 +26,13 @@ public class GetMenusTask extends AsyncTask<Boolean,Void,Void> {
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        menuFragment.toggleLoading();
-    }
-
-    @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         menuFragment.loadWeekMenu();
-        menuFragment.toggleLoading();
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        menuFragment.toggleLoading();
     }
 }

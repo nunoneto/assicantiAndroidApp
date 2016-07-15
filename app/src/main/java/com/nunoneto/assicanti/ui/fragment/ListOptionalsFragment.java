@@ -3,6 +3,8 @@ package com.nunoneto.assicanti.ui.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,7 +25,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ListOptionalsFragment extends BaseFragment {
+public class ListOptionalsFragment extends Fragment {
+
+    public static final String NAME = "LIST_OPTIONALS";
+
     private OnFragmentInteractionListener mListener;
 
     private static final String TAG = "LISTOPTIONALS_FRAG";
@@ -35,6 +40,7 @@ public class ListOptionalsFragment extends BaseFragment {
 
     // Views
     private RecyclerView optionalsRecyclerView;
+    private ContentLoadingProgressBar contentLoadingProgressBar;
 
     public ListOptionalsFragment() {
     }
@@ -62,6 +68,8 @@ public class ListOptionalsFragment extends BaseFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list_optionals, container, false);
         optionalsRecyclerView = (RecyclerView)view.findViewById(R.id.optionalsRecyclerView);
+        contentLoadingProgressBar = (ContentLoadingProgressBar)view.findViewById(R.id.loading);
+
         return view;
     }
 
@@ -79,10 +87,11 @@ public class ListOptionalsFragment extends BaseFragment {
                     }
                 }
         ));
+        contentLoadingProgressBar.hide();
     }
 
-    private void addRemoveIngredient(OptionalItem item, final CompoundButton compoundButton,boolean checked ){
-        toggleLoading();
+    private void addRemoveIngredient(OptionalItem item, final CompoundButton compoundButton, final boolean checked ){
+        contentLoadingProgressBar.show();
         compoundButton.setEnabled(false);
         RestService.getInstance().getAssicantiService()
                 .addRemoveOptional(
@@ -95,9 +104,9 @@ public class ListOptionalsFragment extends BaseFragment {
                 ).enqueue(new Callback<AddOptionalResponse>() {
             @Override
             public void onResponse(Call<AddOptionalResponse> call, Response<AddOptionalResponse> response) {
-                Snackbar.make(getView(),"Opcional adicionado!",Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(),checked ? "Opcional adicionado!" : "Opcional removido!",Snackbar.LENGTH_SHORT).show();
                 compoundButton.setEnabled(true);
-                toggleLoading();
+                contentLoadingProgressBar.hide();
             }
 
             @Override
@@ -107,7 +116,7 @@ public class ListOptionalsFragment extends BaseFragment {
                 Snackbar.make(getView(),"Não foi adicionar o opcional",Snackbar.LENGTH_LONG).show();
                 compoundButton.setChecked(false);
                 compoundButton.setEnabled(true);
-                toggleLoading();
+                contentLoadingProgressBar.hide();
             }
         });
 
@@ -130,8 +139,5 @@ public class ListOptionalsFragment extends BaseFragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
     }
 }

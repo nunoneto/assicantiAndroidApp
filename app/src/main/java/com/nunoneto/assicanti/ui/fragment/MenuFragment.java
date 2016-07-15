@@ -6,17 +6,16 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.nunoneto.assicanti.R;
@@ -26,20 +25,15 @@ import com.nunoneto.assicanti.model.DayMenu;
 import com.nunoneto.assicanti.model.MenuType;
 import com.nunoneto.assicanti.model.Price;
 import com.nunoneto.assicanti.model.WeekMenu;
+import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.tasks.GetMenusTask;
 import com.nunoneto.assicanti.ui.adapters.PriceSpinnerAdapter;
-import com.nunoneto.assicanti.webscraper.WebScrapper;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
-import io.realm.Realm;
+public class MenuFragment extends Fragment {
 
-public class MenuFragment extends BaseFragment {
+    public static final String NAME = "MENU";
 
     private OnFragmentInteractionListener mListener;
     private final static String TAG = "FRAG_MENUS";
@@ -50,6 +44,7 @@ public class MenuFragment extends BaseFragment {
     // Views
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout scrollView;
+    private ContentLoadingProgressBar contentLoadingProgressBar;
 
     public MenuFragment() {
     }
@@ -57,9 +52,20 @@ public class MenuFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        contentLoadingProgressBar.show();
         getMenusTask = new GetMenusTask(MenuFragment.this);
         getMenusTask.execute(false);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        RestService.getInstance().clearCookies();
     }
 
     @Override
@@ -67,6 +73,7 @@ public class MenuFragment extends BaseFragment {
                              Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_menu, container, false);
+        contentLoadingProgressBar = (ContentLoadingProgressBar)root.findViewById(R.id.loading);
         scrollView = (LinearLayout)root.findViewById(R.id.menuContainer);
         swipeRefreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh);
 
@@ -78,6 +85,7 @@ public class MenuFragment extends BaseFragment {
                 else{
                     getMenusTask = new GetMenusTask(MenuFragment.this);
                     getMenusTask.execute(true);
+                    RestService.getInstance().clearCookies();
                 }
             }
         });
@@ -109,11 +117,6 @@ public class MenuFragment extends BaseFragment {
         getMenusTask.cancel(true);
     }
 
-    public interface OnFragmentInteractionListener {
-
-        void showOptionals(Price price);
-    }
-
     public void loadWeekMenu(){
         WeekMenu menu = DataModel.getInstance().getCurrentMenu();
         Calendar cal = Utils.getCalendar();
@@ -124,8 +127,8 @@ public class MenuFragment extends BaseFragment {
             scrollView.removeAllViews();
         }
 
-        for(MenuType menuType : menu.getTypes()){
-            for(DayMenu dayMenu : menuType.getDays()){
+        for(final MenuType menuType : menu.getTypes()){
+            for(final DayMenu dayMenu : menuType.getDays()){
                 if( dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
 
                     CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
@@ -165,7 +168,8 @@ public class MenuFragment extends BaseFragment {
 
         if(swipeRefreshLayout.isRefreshing())
             swipeRefreshLayout.setRefreshing(false);
-
+        else
+            contentLoadingProgressBar.hide();
     }
 
 }
