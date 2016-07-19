@@ -65,17 +65,19 @@ public class WebScrapper {
     /**
      * Parses menu page in order to get the menu information
      */
-    public WeekMenu getMenus(boolean forceUpdate){
+    public void getMenus(boolean forceUpdate){
         WeekMenu weekMenu = null;
 
         if(forceUpdate){
             DataModel.getInstance().deleteCurrentMenu();
         }else{
             //Check if menu already in realm
-            weekMenu = DataModel.getInstance().getCurrentMenu();
-            if(weekMenu != null)
-                return weekMenu;
+            List<DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
+            if(dayMenuList != null && dayMenuList.size() > 0)
+                return;
         }
+
+        WeekMenu latestWeekMenu = DataModel.getInstance().getLastestWeekMenu();
 
         //Get document if not in memory
         if(menuPage == null)
@@ -90,7 +92,8 @@ public class WebScrapper {
 
         Iterator<Element> it = els.iterator();
         weekMenu = null;
-        while (it.hasNext()){
+        boolean alreadyExists = false;
+        while (it.hasNext() && !alreadyExists){
 
             Element el = it.next();
 
@@ -112,6 +115,11 @@ public class WebScrapper {
                 if(dates.size() >= 4){
                     end = parseDate(dates.get(2),dates.get(3));
                 }
+                if(latestWeekMenu != null && latestWeekMenu.getMenuId().equals(start.getTime()+end.getTime()+"")){
+                    alreadyExists = true;
+                    continue;
+                }
+
                 weekMenu = realm.createObject(WeekMenu.class);
                 weekMenu.setStarting(start);
                 weekMenu.setEnding(end);
@@ -154,10 +162,10 @@ public class WebScrapper {
                 parseMeatFish(menus, menuType, type);
             }else {
                 Iterator<Element> menuIt = menus.iterator();
-                while (menuIt.hasNext()){
+                while  // ingore the first elements, it's only dates
+                        (menuIt.hasNext()){
                     Element menu = menuIt.next();
 
-                    // ingore the first elements, it's only dates
                     // dealt with otherwhere
                     if(!menu.text().equals(date.text())){
                         int dayOfWeek = parseWeekDay(menu.select("p > strong").text());
@@ -178,8 +186,6 @@ public class WebScrapper {
 
         realm.commitTransaction();
         realm.close();
-
-        return weekMenu;
     }
 
     public List<OptionalGroup> parseOptionals(String html){

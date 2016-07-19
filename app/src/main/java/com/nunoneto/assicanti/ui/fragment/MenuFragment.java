@@ -30,6 +30,7 @@ import com.nunoneto.assicanti.tasks.GetMenusTask;
 import com.nunoneto.assicanti.ui.adapters.PriceSpinnerAdapter;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class MenuFragment extends Fragment {
 
@@ -118,7 +119,8 @@ public class MenuFragment extends Fragment {
     }
 
     public void loadWeekMenu(){
-        WeekMenu menu = DataModel.getInstance().getCurrentMenu();
+
+        List<DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
         Calendar cal = Utils.getCalendar();
 
         LayoutInflater inflater = LayoutInflater.from(getActivity().getApplicationContext());
@@ -126,11 +128,12 @@ public class MenuFragment extends Fragment {
         if(scrollView.getChildCount() > 0){
             scrollView.removeAllViews();
         }
+        if(dayMenuList == null || dayMenuList.size() <= 0){
 
-        for(final MenuType menuType : menu.getTypes()){
-            for(final DayMenu dayMenu : menuType.getDays()){
+        }else{
+            for(final DayMenu dayMenu : dayMenuList){
                 if( dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
-
+                    MenuType menuType = dayMenu.getMenuType();
                     CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
                     card.setId(View.generateViewId());
 
@@ -161,7 +164,6 @@ public class MenuFragment extends Fragment {
                     int margin = Utils.dpToPx(8,getContext());
                     params.setMargins(margin,margin,margin,margin);
                     scrollView.addView(card,params);
-
                 }
             }
         }

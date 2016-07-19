@@ -12,10 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nunoneto.assicanti.R;
+import com.nunoneto.assicanti.Utils;
 import com.nunoneto.assicanti.model.Price;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
 import com.nunoneto.assicanti.ui.fragment.OnFragmentInteractionListener;
 import com.nunoneto.assicanti.ui.fragment.OptionalsFragment;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showMenus(){
+        Calendar cal = Utils.getCalendar();
+        getSupportActionBar().setTitle();
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container,new MenuFragment(),MenuFragment.NAME)
@@ -86,12 +91,13 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.dayMenu) {
+
+        } else if (id == R.id.weekMenu) {
+
+        }else if (id == R.id.myOrders) {
 
         }
 

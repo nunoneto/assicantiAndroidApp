@@ -15,6 +15,7 @@ public class DayMenu extends RealmObject {
     private String description;
     private String type;
     private RealmList<DayMenu> days;
+    private MenuType menuType;
 
     public DayMenu(){this.days = new RealmList<>();}
 
@@ -53,5 +54,13 @@ public class DayMenu extends RealmObject {
 
     public void setDays(RealmList<DayMenu> days) {
         this.days = days;
+    }
+
+    public MenuType getMenuType() {
+        return menuType;
+    }
+
+    public void setMenuType(MenuType menuType) {
+        this.menuType = menuType;
     }
 }

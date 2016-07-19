@@ -3,12 +3,16 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
+            android:id="@+id/dayMenu"
+            android:icon="@drawable/ic_restaurant_menu_black_48dp"
             android:title="Menu De Hoje" />
         <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
+            android:id="@+id/weekMenu"
+            android:icon="@drawable/ic_restaurant_menu_black_48dp"
+            android:title="Menu Semanal" />
+        <item
+            android:id="@+id/myOrders"
+            android:icon="@drawable/ic_border_color_black_48dp"
             android:title="Meus Pedidos" />
     </group>
 

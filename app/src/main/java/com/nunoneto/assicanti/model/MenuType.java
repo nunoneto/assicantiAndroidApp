@@ -12,6 +12,7 @@ public class MenuType extends RealmObject{
     private RealmList<DayMenu> days = new RealmList<>();
     private MenuTypeImage menuTypeImage;
     private RealmList<Price> prices = new RealmList<>();
+    private WeekMenu weekMenu;
 
     public MenuType(){}
 
@@ -45,5 +46,13 @@ public class MenuType extends RealmObject{
 
     public void setPrices(RealmList<Price> prices) {
         this.prices = prices;
+    }
+
+    public WeekMenu getWeekMenu() {
+        return weekMenu;
+    }
+
+    public void setWeekMenu(WeekMenu weekMenu) {
+        this.weekMenu = weekMenu;
     }
 }
