@@ -44,7 +44,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
     public static final String PARAM_TIER = "PARAM_TIER";
     public static final String PARAM_PRICE_ID = "PARAM_PRICE_ID";
 
-    private String itemId, size, tier, multiType, priceId;
+    private String itemId, size, tier, priceId;
     private GetOptionalsTask getOptionalsTask;
 
     //View
@@ -187,14 +187,14 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
                 .addToCart2(
                         RequestConstants.AddToCart2.ACTION,
                         RequestConstants.AddToCart2.TYPE,
-                        "",
-                        "",
+                        priceId,
+                        "1",
                         ""
                 ).enqueue(new Callback<AddToCart2Response>() {
             @Override
             public void onResponse(Call<AddToCart2Response> call, Response<AddToCart2Response> response) {
                 contentLoadingProgressBar.hide();
-                //TODO go to next activity
+                mListener.showForm();
             }
 
             @Override

@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -72,16 +73,15 @@ public class WebScrapper {
             DataModel.getInstance().deleteCurrentMenu();
         }else{
             //Check if menu already in realm
-            List<DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
+            HashMap<MenuType, DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
             if(dayMenuList != null && dayMenuList.size() > 0)
                 return;
         }
 
         WeekMenu latestWeekMenu = DataModel.getInstance().getLastestWeekMenu();
 
-        //Get document if not in memory
-        if(menuPage == null)
-            getMenuPage();
+        //Get document
+        getMenuPage();
 
         Elements els = menuPage.select("div.so-panel.widget.widget_wppizza > article");
 
@@ -290,7 +290,7 @@ public class WebScrapper {
      * @return Calendar.MONDAY - Calendar.FRIDAY
      */
     private int  parseWeekDay(String weekDayText){
-        weekDayText = weekDayText.replace("•","").replace(":","").replace("&nbsp;","").trim();
+        weekDayText = weekDayText.replace("•","").replace(":","").replace("&nbsp;","").replace(String.valueOf((char) 160),"").trim();
         SimpleDateFormat dayFormat = new SimpleDateFormat("E", new Locale("pt","pt"));
         Date date = null;
         try {

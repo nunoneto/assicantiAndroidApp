@@ -8,4 +8,8 @@ import com.nunoneto.assicanti.model.Price;
 public interface OnFragmentInteractionListener {
 
     void showOptionals(Price price);
+
+    void showForm();
+
+    void setTitle(String title);
 }

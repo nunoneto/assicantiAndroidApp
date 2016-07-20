@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,8 +30,11 @@ import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.tasks.GetMenusTask;
 import com.nunoneto.assicanti.ui.adapters.PriceSpinnerAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class MenuFragment extends Fragment {
 
@@ -120,8 +124,9 @@ public class MenuFragment extends Fragment {
 
     public void loadWeekMenu(){
 
-        List<DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
+        HashMap<MenuType,DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
         Calendar cal = Utils.getCalendar();
+        String dateTitle = null;
 
         LayoutInflater inflater = LayoutInflater.from(getActivity().getApplicationContext());
 
@@ -129,42 +134,45 @@ public class MenuFragment extends Fragment {
             scrollView.removeAllViews();
         }
         if(dayMenuList == null || dayMenuList.size() <= 0){
-
+            //TODO build warning in layout
         }else{
-            for(final DayMenu dayMenu : dayMenuList){
-                if( dayMenu.getDayOfWeek() == cal.get(Calendar.DAY_OF_WEEK)){
-                    MenuType menuType = dayMenu.getMenuType();
-                    CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
-                    card.setId(View.generateViewId());
+            for(MenuType menuType : dayMenuList.keySet()){
+                DayMenu dayMenu = dayMenuList.get(menuType);
+                CardView card = (CardView) inflater.inflate(R.layout.view_menu_card,null);
+                card.setId(View.generateViewId());
 
-
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(menuType.getMenuTypeImage().getImage(),0,menuType.getMenuTypeImage().getImage().length);
-                    bitmap = Utils.blurRenderScript(getContext(),bitmap,3);
-                    ((ImageView)card.findViewById(R.id.imageMenuType)).setImageBitmap(bitmap);
-                    ((TextView)card.findViewById(R.id.menuType)).setText(dayMenu.getType());
-                    ((TextView)card.findViewById(R.id.menuDescription)).setText(dayMenu.getDescription());
-
-                    PriceSpinnerAdapter adapter = new PriceSpinnerAdapter(
-                            getActivity().getApplicationContext(),
-                            R.layout.spinner_price,
-                            menuType.getPrices()
-                    );
-                    final AppCompatSpinner appCompatSpinner = ((AppCompatSpinner)card.findViewById(R.id.priceSpinner));
-                    appCompatSpinner.setAdapter(adapter);
-
-                    card.findViewById(R.id.orderMenu).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Price price = (Price)appCompatSpinner.getSelectedItem();
-                            MenuFragment.this.mListener.showOptionals(price);
-                        }
-                    });
-
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                    int margin = Utils.dpToPx(8,getContext());
-                    params.setMargins(margin,margin,margin,margin);
-                    scrollView.addView(card,params);
+                if(dateTitle == null){
+                    SimpleDateFormat sdf = new SimpleDateFormat("E',' d 'de' MMMM",new Locale("pt","pt"));
+                    dateTitle = sdf.format(DataModel.getInstance().getTargetDate());
+                    mListener.setTitle(dateTitle);
                 }
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(menuType.getMenuTypeImage().getImage(),0,menuType.getMenuTypeImage().getImage().length);
+                bitmap = Utils.blurRenderScript(getContext(),bitmap,3);
+                ((ImageView)card.findViewById(R.id.imageMenuType)).setImageBitmap(bitmap);
+                ((TextView)card.findViewById(R.id.menuType)).setText(dayMenu.getType());
+                ((TextView)card.findViewById(R.id.menuDescription)).setText(dayMenu.getDescription());
+
+                PriceSpinnerAdapter adapter = new PriceSpinnerAdapter(
+                        getActivity().getApplicationContext(),
+                        R.layout.spinner_price,
+                        menuType.getPrices()
+                );
+                final AppCompatSpinner appCompatSpinner = ((AppCompatSpinner)card.findViewById(R.id.priceSpinner));
+                appCompatSpinner.setAdapter(adapter);
+
+                card.findViewById(R.id.orderMenu).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Price price = (Price)appCompatSpinner.getSelectedItem();
+                        MenuFragment.this.mListener.showOptionals(price);
+                    }
+                });
+
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                int margin = Utils.dpToPx(8,getContext());
+                params.setMargins(margin,margin,margin,margin);
+                scrollView.addView(card,params);
             }
         }
 

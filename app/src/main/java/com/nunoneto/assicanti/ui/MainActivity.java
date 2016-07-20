@@ -13,7 +13,9 @@ import android.view.MenuItem;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.Utils;
+import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.Price;
+import com.nunoneto.assicanti.ui.fragment.CustomerDataFragment;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
 import com.nunoneto.assicanti.ui.fragment.OnFragmentInteractionListener;
 import com.nunoneto.assicanti.ui.fragment.OptionalsFragment;
@@ -45,14 +47,12 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                FragmentManager.BackStackEntry entry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount()-1);
+
             }
         });
     }
 
     private void showMenus(){
-        Calendar cal = Utils.getCalendar();
-        getSupportActionBar().setTitle();
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container,new MenuFragment(),MenuFragment.NAME)
@@ -111,9 +111,23 @@ public class MainActivity extends AppCompatActivity
     public void showOptionals(Price price) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier(),price.getId()))
+                .add(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier(),price.getId()),OptionalsFragment.NAME)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void showForm() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.container, CustomerDataFragment.newInstance(),CustomerDataFragment.TAG)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Override
+    public void setTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 
 }

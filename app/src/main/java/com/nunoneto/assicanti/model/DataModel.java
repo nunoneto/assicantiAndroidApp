@@ -2,8 +2,10 @@ package com.nunoneto.assicanti.model;
 
 import com.nunoneto.assicanti.Utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,6 +45,21 @@ public class DataModel {
         getCurrentMenuQuery().findAll().deleteFromRealm(0);
         realm.commitTransaction();
         realm.close();
+    }
+
+    public Date getTargetDate(){
+        Calendar cal = Utils.getCalendar();
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+        if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
+                || (dayOfWeek == Calendar.FRIDAY && hour > 11)) {
+            cal.add(Calendar.WEEK_OF_MONTH,1);
+            cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
+        }else if(hour > 11){
+            cal.add(Calendar.DAY_OF_WEEK,1);
+        }
+        return cal.getTime();
     }
 
     public Date getStartDate(){
@@ -117,8 +134,8 @@ public class DataModel {
      * If in weekend or friday after 11, the next monday's menu must be returned, if available
      * @return
      */
-    public List<DayMenu> getCurrentDayMenu(){
-        List<DayMenu> dayMenuList = null;
+    public HashMap<MenuType,DayMenu> getCurrentDayMenu(){
+        HashMap<MenuType,DayMenu> dayMenuList = new HashMap<>();
         Calendar cal = Utils.getCalendar();
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
         int hour = cal.get(Calendar.HOUR_OF_DAY);
@@ -139,7 +156,7 @@ public class DataModel {
                 for(MenuType menuType : weekMenu.getTypes()){
                     for(DayMenu menu : menuType.getDays()){
                         if(menu.getDayOfWeek() == Calendar.MONDAY)
-                            dayMenuList.add(menu);
+                            dayMenuList.put(menuType,menu);
                     }
                 }
             }else{
@@ -147,7 +164,7 @@ public class DataModel {
                     for(MenuType menuType : weekMenu.getTypes()){
                         for(DayMenu menu : menuType.getDays()) {
                             if(menu.getDayOfWeek() == Utils.getCalendar().get(Calendar.DAY_OF_WEEK))
-                                dayMenuList.add(menu);
+                                dayMenuList.put(menuType,menu);
                         }
                     }
                 }else{
@@ -156,7 +173,7 @@ public class DataModel {
                         tempCal.add(Calendar.DAY_OF_WEEK, 1);
                         for(DayMenu menu : menuType.getDays()) {
                             if(menu.getDayOfWeek() == tempCal.get(Calendar.DAY_OF_WEEK))
-                                dayMenuList.add(menu);
+                                dayMenuList.put(menuType,menu);
                         }
                     }
 
