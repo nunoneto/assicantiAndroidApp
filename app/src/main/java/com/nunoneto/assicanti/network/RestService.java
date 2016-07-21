@@ -3,6 +3,7 @@ package com.nunoneto.assicanti.network;
 import com.facebook.stetho.inspector.protocol.module.Network;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
+import com.mobprofs.retrofit.converters.SimpleXmlConverter;
 
 import java.io.IOException;
 import java.net.CookieManager;
@@ -22,6 +23,7 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.Url;
 
 /**
@@ -65,6 +67,7 @@ public class RestService {
                 .client(client)
                 .baseUrl("http://assicanti.pt")
                 .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(SimpleXmlConverterFactory.create())
                 .build();
         assicantiService = retrofit.create(AssicantiService.class);
     }

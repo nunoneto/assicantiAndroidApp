@@ -57,5 +57,13 @@ public interface AssicantiService {
             @Field("vars[catId]") String catId
     );
 
+    @FormUrlEncoded
+    @POST("/wp-admin/admin-ajax.php")
+    Call<AddToCart2Response> register(
+            @Field("action") String action,
+            @Field("vars[type]") String type,
+            @Field("vars[val]") String val
+    );
+
 
 }

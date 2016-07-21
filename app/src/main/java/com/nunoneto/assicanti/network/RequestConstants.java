@@ -34,6 +34,12 @@ public class RequestConstants {
         public static final String TYPE = "refresh";
     }
 
+    public class Register{
+        public static final String ACTION = "wppizza_json";
+        public static final String TYPE = "nonce";
+        public static final String VAL = "register";
+    }
+
 
 
 }
