@@ -83,105 +83,109 @@ public class WebScrapper {
         //Get document
         getMenuPage();
 
-        Elements els = menuPage.select("div.so-panel.widget.widget_wppizza > article");
-
-        // Iterate over each menu: veg, fish, meat, ..
-
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
 
-        Iterator<Element> it = els.iterator();
-        weekMenu = null;
-        boolean alreadyExists = false;
-        while (it.hasNext() && !alreadyExists){
+        try{
+            Elements els = menuPage.select("div.so-panel.widget.widget_wppizza > article");
 
-            Element el = it.next();
+            // Iterate over each menu: veg, fish, meat, ..
+            Iterator<Element> it = els.iterator();
+            weekMenu = null;
+            boolean alreadyExists = false;
+            while (it.hasNext() && !alreadyExists){
 
-            //DOM queries
-            String type = el.select("h2.wppizza-article-title").text().replace("Menu ", "");
-            Element info = el.select("div.wppizza-article-info").first();
-            Elements menus = info.select("p");
-            Element date = info.select("p").first();
-            Elements dates = date.select("strong,b");
-            Elements prices = el.select(".wppizza-article-tiers > .wppizza-article-price");
+                Element el = it.next();
 
-            if(weekMenu == null){
-                Date start = null,
-                        end = null;
-                // Parse Dates
-                if(dates.size() >= 2){
-                    start = parseDate(dates.get(0),dates.get(1));
+                //DOM queries
+                String type = el.select("h2.wppizza-article-title").text().replace("Menu ", "");
+                Element info = el.select("div.wppizza-article-info").first();
+                Elements menus = info.select("p");
+                Element date = info.select("p").first();
+                Elements dates = date.select("strong,b");
+                Elements prices = el.select(".wppizza-article-tiers > .wppizza-article-price");
+
+                if(weekMenu == null){
+                    Date start = null,
+                            end = null;
+                    // Parse Dates
+                    if(dates.size() >= 2){
+                        start = parseDate(dates.get(0),dates.get(1));
+                    }
+                    if(dates.size() >= 4){
+                        end = parseDate(dates.get(2),dates.get(3));
+                    }
+                    if(latestWeekMenu != null && latestWeekMenu.getMenuId().equals(start.getTime()+end.getTime()+"")){
+                        alreadyExists = true;
+                        continue;
+                    }
+
+                    weekMenu = realm.createObject(WeekMenu.class);
+                    weekMenu.setStarting(start);
+                    weekMenu.setEnding(end);
+                    weekMenu.setMenuId();
                 }
-                if(dates.size() >= 4){
-                    end = parseDate(dates.get(2),dates.get(3));
+
+                MenuType menuType = realm.createObject(MenuType.class);
+                menuType.setType(type);
+                weekMenu.getTypes().add(menuType);
+                MenuTypeImage menuTypeImage = imageExists(type);
+                if(menuTypeImage == null){
+                    menuTypeImage = realm.createObject(MenuTypeImage.class);
+                    menuTypeImage.setMenuType(type.toUpperCase());
+
+                    String src = el.select(".wppizza-article-img > img").first().absUrl("src");;
+                    menuTypeImage.setImage(downloadImage(src));
                 }
-                if(latestWeekMenu != null && latestWeekMenu.getMenuId().equals(start.getTime()+end.getTime()+"")){
-                    alreadyExists = true;
-                    continue;
+                menuType.setMenuTypeImage(menuTypeImage);
+                //price
+                for(Element priceEl : prices){
+                    Price price = realm.createObject(Price.class);
+                    Number num = null;
+                    try {
+                        num = NumberFormat.getInstance().parse(priceEl.select("span > span").first().text());
+                        price.setPrice(num.doubleValue());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    price.setType(priceEl.select(".wppizza-article-price-lbl").first().text());
+                    price.setCurrency(priceEl.parent().select(".wppizza-article-price-currency").first().text().trim());
+                    String[] id = priceEl.id().split("-");
+                    price.setItemId(id[1]);
+                    price.setTier(id[2]);
+                    price.setSize(id[3]);
+                    price.setId(priceEl.id());
+                    menuType.getPrices().add(price);
                 }
+                // get each day menu
+                if(type.equals(Type.FISH) || type.equals(Type.VEGAN)){
+                    parseMeatFish(menus, menuType, type);
+                }else {
+                    Iterator<Element> menuIt = menus.iterator();
+                    while  // ingore the first elements, it's only dates
+                            (menuIt.hasNext()){
+                        Element menu = menuIt.next();
 
-                weekMenu = realm.createObject(WeekMenu.class);
-                weekMenu.setStarting(start);
-                weekMenu.setEnding(end);
-                weekMenu.setMenuId();
-            }
+                        // dealt with otherwhere
+                        if(!menu.text().equals(date.text())){
+                            int dayOfWeek = parseWeekDay(menu.select("p > strong").text());
+                            menu.select("p").remove();
+                            menu.select("strong").remove();
+                            String description = menu.select("p").text().replace("• ","");
 
-            MenuType menuType = realm.createObject(MenuType.class);
-            menuType.setType(type);
-            weekMenu.getTypes().add(menuType);
-            MenuTypeImage menuTypeImage = imageExists(type);
-            if(menuTypeImage == null){
-                menuTypeImage = realm.createObject(MenuTypeImage.class);
-                menuTypeImage.setMenuType(type.toUpperCase());
+                            DayMenu dayMenu = realm.createObject(DayMenu.class);
+                            dayMenu.setDayOfWeek(dayOfWeek);
+                            dayMenu.setDescription(description);
+                            dayMenu.setType(type);
+                            menuType.getDays().add(dayMenu);
 
-                String src = el.select(".wppizza-article-img > img").first().absUrl("src");;
-                menuTypeImage.setImage(downloadImage(src));
-            }
-            menuType.setMenuTypeImage(menuTypeImage);
-            //price
-            for(Element priceEl : prices){
-                Price price = realm.createObject(Price.class);
-                Number num = null;
-                try {
-                    num = NumberFormat.getInstance().parse(priceEl.select("span > span").first().text());
-                    price.setPrice(num.doubleValue());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                price.setType(priceEl.select(".wppizza-article-price-lbl").first().text());
-                price.setCurrency(priceEl.parent().select(".wppizza-article-price-currency").first().text().trim());
-                String[] id = priceEl.id().split("-");
-                price.setItemId(id[1]);
-                price.setTier(id[2]);
-                price.setSize(id[3]);
-                price.setId(priceEl.id());
-                menuType.getPrices().add(price);
-            }
-            // get each day menu
-            if(type.equals(Type.FISH) || type.equals(Type.VEGAN)){
-                parseMeatFish(menus, menuType, type);
-            }else {
-                Iterator<Element> menuIt = menus.iterator();
-                while  // ingore the first elements, it's only dates
-                        (menuIt.hasNext()){
-                    Element menu = menuIt.next();
-
-                    // dealt with otherwhere
-                    if(!menu.text().equals(date.text())){
-                        int dayOfWeek = parseWeekDay(menu.select("p > strong").text());
-                        menu.select("p").remove();
-                        menu.select("strong").remove();
-                        String description = menu.select("p").text().replace("• ","");
-
-                        DayMenu dayMenu = realm.createObject(DayMenu.class);
-                        dayMenu.setDayOfWeek(dayOfWeek);
-                        dayMenu.setDescription(description);
-                        dayMenu.setType(type);
-                        menuType.getDays().add(dayMenu);
-
+                        }
                     }
                 }
             }
+        }catch (Exception ex){
+            Log.e(TAG,"Failed to parse menu page");
+            ex.printStackTrace();
         }
 
         realm.commitTransaction();
@@ -191,33 +195,38 @@ public class WebScrapper {
     public List<OptionalGroup> parseOptionals(String html){
 
         List<OptionalGroup> groups = new ArrayList<>();
-        Document doc = Jsoup.parse(html);
-        Elements optGroups = doc.select(".wppizza-imulti > fieldset.wppizza-list-ingredients");
+        try{
+            Document doc = Jsoup.parse(html);
+            Elements optGroups = doc.select(".wppizza-imulti > fieldset.wppizza-list-ingredients");
 
-        String multiType = doc.select("#wppizza-ingr-multitype").first().attr("value");
+            String multiType = doc.select("#wppizza-ingr-multitype").first().attr("value");
 
-        for(Element opt : optGroups){
+            for(Element opt : optGroups){
 
-            OptionalGroup group = new OptionalGroup();
-            group.setName(opt.select("legend").first().text());
-            group.setMultiType(multiType);
+                OptionalGroup group = new OptionalGroup();
+                group.setName(opt.select("legend").first().text());
+                group.setMultiType(multiType);
 
-            Elements items = opt.select("ul > li");
-            for (Element item : items){
+                Elements items = opt.select("ul > li");
+                for (Element item : items){
 
-                String[] id = item.id().split("-");
+                    String[] id = item.id().split("-");
 
-                OptionalItem optional = new OptionalItem(
-                        item.select("label.wppizza-doingredient-lbl").first().text(),
-                        id[3],
-                        id[5],
-                        id[2],
-                        id[4]
-                );
-                group.getItems().add(optional);
+                    OptionalItem optional = new OptionalItem(
+                            item.select("label.wppizza-doingredient-lbl").first().text(),
+                            id[3],
+                            id[5],
+                            id[2],
+                            id[4]
+                    );
+                    group.getItems().add(optional);
 
+                }
+                groups.add(group);
             }
-            groups.add(group);
+        }catch (Exception e){
+            Log.e(TAG,"Could not parse optionals");
+            e.printStackTrace();
         }
         return groups;
     }

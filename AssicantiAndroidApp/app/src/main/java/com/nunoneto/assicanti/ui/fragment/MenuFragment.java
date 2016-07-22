@@ -11,8 +11,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -47,6 +51,7 @@ public class MenuFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout scrollView;
     private ContentLoadingProgressBar contentLoadingProgressBar;
+    private LinearLayout noMenuWarning;
 
     public MenuFragment() {
     }
@@ -59,9 +64,15 @@ public class MenuFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        updateMenu(false);
+    }
+
+    private void updateMenu(boolean force){
+        noMenuWarning.setVisibility(View.GONE);
         contentLoadingProgressBar.show();
         getMenusTask = new GetMenusTask(MenuFragment.this);
-        getMenusTask.execute(false);
+        getMenusTask.execute(force);
+
     }
 
     @Override
@@ -78,6 +89,7 @@ public class MenuFragment extends Fragment {
         contentLoadingProgressBar = (ContentLoadingProgressBar)root.findViewById(R.id.loading);
         scrollView = (LinearLayout)root.findViewById(R.id.menuContainer);
         swipeRefreshLayout = (SwipeRefreshLayout)root.findViewById(R.id.swipeRefresh);
+        noMenuWarning = (LinearLayout) root.findViewById(R.id.noMenuWarning);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -119,19 +131,35 @@ public class MenuFragment extends Fragment {
         getMenusTask.cancel(true);
     }
 
+    private void toggleNoMenuWarning(){
+        noMenuWarning.setVisibility(View.VISIBLE);
+
+        ImageView arrow = (ImageView) noMenuWarning.findViewById(R.id.arrowImg);
+
+        arrow.clearAnimation();
+        TranslateAnimation translation;
+        translation = new TranslateAnimation(0f, 0f, 0f, arrow.getHeight()/3);
+        translation.setStartOffset(500);
+        translation.setDuration(1500);
+        translation.setFillAfter(true);
+        translation.setInterpolator(new BounceInterpolator());
+        translation.setRepeatCount(Animation.INFINITE);
+        arrow.startAnimation(translation);
+
+    }
+
     public void loadWeekMenu(){
 
         HashMap<MenuType,DayMenu> dayMenuList = DataModel.getInstance().getCurrentDayMenu();
-        Calendar cal = Utils.getCalendar();
         String dateTitle = null;
 
         LayoutInflater inflater = LayoutInflater.from(getActivity().getApplicationContext());
 
-        if(scrollView.getChildCount() > 0){
+        if(scrollView.getChildCount() > 0)
             scrollView.removeAllViews();
-        }
+
         if(dayMenuList == null || dayMenuList.size() <= 0){
-            //TODO build warning in layout
+            toggleNoMenuWarning();
         }else{
             for(MenuType menuType : dayMenuList.keySet()){
                 DayMenu dayMenu = dayMenuList.get(menuType);

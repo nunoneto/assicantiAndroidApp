@@ -106,10 +106,10 @@ public class CustomerDataFragment extends Fragment {
         final Realm realm = Realm.getDefaultInstance();
         final RealmResults<CustomerData> data = realm.where(CustomerData.class).findAllSorted("insertedAt", Sort.DESCENDING);
 
-        ExistingCustomerDataDialogFragment dialog = ExistingCustomerDataDialogFragment.newInstance(new YesNoDialogListener() {
-            @Override
-            public void yes() {
-                if(data != null && data.size() > 0){
+        if(data != null && data.size() > 0) {
+            ExistingCustomerDataDialogFragment dialog = ExistingCustomerDataDialogFragment.newInstance(new YesNoDialogListener() {
+                @Override
+                public void yes() {
                     CustomerData customerData = data.first();
                     name.setText(customerData.getName());
                     comment.setText(customerData.getComment());
@@ -118,16 +118,16 @@ public class CustomerDataFragment extends Fragment {
                     contact.setText(customerData.getContact());
                     email.setText(customerData.getEmail());
                     nif.setText(customerData.getNif());
+                    realm.close();
                 }
-                realm.close();
-            }
+                @Override
+                public void no() {
+                }
+            });
+            dialog.show(getActivity().getFragmentManager(),ExistingCustomerDataDialogFragment.TAG);
+        }
+        realm.close();
 
-            @Override
-            public void no() {
-                realm.close();
-            }
-        });
-        dialog.show(getActivity().getFragmentManager(),ExistingCustomerDataDialogFragment.TAG);
     }
 
     private void saveCustomerData() {
