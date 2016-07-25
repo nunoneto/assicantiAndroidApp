@@ -1,6 +1,4 @@
-package com.nunoneto.assicanti.model;
-
-import android.util.Base64;
+package com.nunoneto.assicanti.model.entity;
 
 import java.util.Date;
 

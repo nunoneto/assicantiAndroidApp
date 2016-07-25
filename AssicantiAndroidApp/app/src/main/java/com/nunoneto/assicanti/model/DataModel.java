@@ -1,19 +1,21 @@
 package com.nunoneto.assicanti.model;
 
 import com.nunoneto.assicanti.Utils;
+import com.nunoneto.assicanti.model.entity.DayMenu;
+import com.nunoneto.assicanti.model.entity.MenuType;
+import com.nunoneto.assicanti.model.entity.OptionalGroup;
+import com.nunoneto.assicanti.model.entity.Order;
+import com.nunoneto.assicanti.model.entity.WeekMenu;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import retrofit2.Callback;
 
 /**
  * Created by Nuno on 12/07/2016.
@@ -24,8 +26,7 @@ public class DataModel {
 
     private List<WeekMenu> menus;
     private List<OptionalGroup> optionalGroups;
-
-
+    private Order currentOrder;
 
     public static DataModel getInstance() {
         return instance != null ? instance : (instance = new DataModel());
@@ -219,5 +220,25 @@ public class DataModel {
 
     public void setOptionalGroups(List<OptionalGroup> optionalGroups) {
         this.optionalGroups = optionalGroups;
+    }
+
+    public static void setInstance(DataModel instance) {
+        DataModel.instance = instance;
+    }
+
+    public List<WeekMenu> getMenus() {
+        return menus;
+    }
+
+    public void setMenus(List<WeekMenu> menus) {
+        this.menus = menus;
+    }
+
+    public Order getCurrentOrder() {
+        return currentOrder;
+    }
+
+    public void setCurrentOrder(Order currentOrder) {
+        this.currentOrder = currentOrder;
     }
 }

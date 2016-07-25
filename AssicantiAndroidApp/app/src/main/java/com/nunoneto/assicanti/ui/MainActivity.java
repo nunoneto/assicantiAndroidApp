@@ -8,11 +8,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.Price;
+import com.nunoneto.assicanti.model.entity.OrderPhase;
+import com.nunoneto.assicanti.model.entity.Price;
 import com.nunoneto.assicanti.ui.fragment.CustomerDataFragment;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
 import com.nunoneto.assicanti.ui.fragment.OnOrderFragmentListener;
@@ -23,6 +23,12 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OnOrderFragmentListener {
 
+    private int orderPhase;
+
+    private NavigationView navigationView;
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle toggle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,13 +36,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         showMenus();
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showMenus(){
+        updateNavigation(OrderPhase.MENU);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container,new MenuFragment(),MenuFragment.NAME)
@@ -85,9 +92,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    private void updateNavigation(int orderPhase){
+        this.orderPhase = orderPhase;
+        this.toggle.setDrawerIndicatorEnabled(orderPhase > OrderPhase.MENU ? false : true);
+    }
 
     @Override
     public void showOptionals(Price price) {
+        updateNavigation(OrderPhase.OPTIONALS);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier(),price.getId()),OptionalsFragment.NAME)
@@ -97,6 +109,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void showForm() {
+        updateNavigation(OrderPhase.CUSTOMERDATA);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container, CustomerDataFragment.newInstance(),CustomerDataFragment.TAG)
@@ -111,6 +124,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void goToSummary() {
+        updateNavigation(OrderPhase.SUMMARY);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.container, OrderSummaryFragment.newInstance(),OrderSummaryFragment.TAG)

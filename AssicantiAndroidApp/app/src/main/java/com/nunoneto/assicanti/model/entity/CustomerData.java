@@ -1,4 +1,4 @@
-package com.nunoneto.assicanti.model;
+package com.nunoneto.assicanti.model.entity;
 
 import java.util.Date;
 
@@ -11,6 +11,19 @@ public class CustomerData extends RealmObject {
 
     private String name, contact, comment, nif, address, companyCode, email;
     private Date insertedAt;
+
+    public CustomerData() {    }
+
+    public CustomerData(String name, String contact, String comment, String nif, String address, String companyCode, String email, Date insertedAt) {
+        this.name = name;
+        this.contact = contact;
+        this.comment = comment;
+        this.nif = nif;
+        this.address = address;
+        this.companyCode = companyCode;
+        this.email = email;
+        this.insertedAt = insertedAt;
+    }
 
     public String getName() {
         return name;

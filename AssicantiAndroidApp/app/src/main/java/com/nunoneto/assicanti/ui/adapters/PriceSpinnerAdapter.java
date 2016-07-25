@@ -1,10 +1,9 @@
 package com.nunoneto.assicanti.ui.adapters;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.Price;
+import com.nunoneto.assicanti.model.entity.Price;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -1,6 +1,6 @@
 package com.nunoneto.assicanti.ui.fragment;
 
-import com.nunoneto.assicanti.model.Price;
+import com.nunoneto.assicanti.model.entity.Price;
 
 /**
  * Created by NB20301 on 15/07/2016.

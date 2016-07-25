@@ -1,4 +1,4 @@
-package com.nunoneto.assicanti.model;
+package com.nunoneto.assicanti.model.entity;
 
 /**
  * Created by NB20301 on 12/07/2016.

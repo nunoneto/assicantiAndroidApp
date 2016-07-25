@@ -6,11 +6,10 @@
     android:orientation="vertical"
     tools:context="com.nunoneto.assicanti.ui.fragment.OrderSummaryFragment">
 
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="A sua Encomenda"
+        android:text="Encomenda Completa!"
         android:textStyle="bold"
         android:textSize="20sp"
         android:padding="10dp"
@@ -108,7 +107,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/bottom_border"
             >
 
@@ -131,21 +130,14 @@
 
     </android.support.v7.widget.CardView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/dashed_line">
-    </LinearLayout>
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Detalhe"
+        android:text="Detalhe da Encomenda"
         android:textStyle="bold"
-        android:textSize="17sp"
-        android:padding="5dp"
+        android:textSize="15sp"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
         android:gravity="center"/>
 
 

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.OptionalItem;
+import com.nunoneto.assicanti.model.entity.OptionalItem;
 
 import java.util.List;
 

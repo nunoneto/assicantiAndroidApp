@@ -15,7 +15,7 @@ import android.widget.CompoundButton;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.OptionalItem;
+import com.nunoneto.assicanti.model.entity.OptionalItem;
 import com.nunoneto.assicanti.network.RequestConstants;
 import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.network.response.AddOptionalResponse;
@@ -84,6 +84,12 @@ public class ListOptionalsFragment extends Fragment {
                     @Override
                     public void onItemChecked(boolean checked, OptionalItem item, CompoundButton compoundButton) {
                         addRemoveIngredient(item,compoundButton, checked);
+
+                        if(checked) // Add
+                            DataModel.getInstance().getCurrentOrder().getOptionalItems().add(item);
+                        else        // Remove
+                            DataModel.getInstance().getCurrentOrder().getOptionalItems().remove(item);
+
                     }
                 }
         ));

@@ -3,14 +3,14 @@ package com.nunoneto.assicanti.webscraper;
 import android.util.Log;
 
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.DayMenu;
-import com.nunoneto.assicanti.model.MenuType;
-import com.nunoneto.assicanti.model.MenuTypeImage;
-import com.nunoneto.assicanti.model.OptionalGroup;
-import com.nunoneto.assicanti.model.OptionalItem;
-import com.nunoneto.assicanti.model.Price;
-import com.nunoneto.assicanti.model.WeekMenu;
-import com.nunoneto.assicanti.model.Type;
+import com.nunoneto.assicanti.model.entity.DayMenu;
+import com.nunoneto.assicanti.model.entity.MenuType;
+import com.nunoneto.assicanti.model.entity.MenuTypeImage;
+import com.nunoneto.assicanti.model.entity.OptionalGroup;
+import com.nunoneto.assicanti.model.entity.OptionalItem;
+import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.WeekMenu;
+import com.nunoneto.assicanti.model.entity.Type;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 /**

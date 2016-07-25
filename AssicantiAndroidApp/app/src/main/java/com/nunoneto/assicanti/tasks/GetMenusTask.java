@@ -2,8 +2,6 @@ package com.nunoneto.assicanti.tasks;
 
 import android.os.AsyncTask;
 
-import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.WeekMenu;
 import com.nunoneto.assicanti.ui.fragment.MenuFragment;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
 

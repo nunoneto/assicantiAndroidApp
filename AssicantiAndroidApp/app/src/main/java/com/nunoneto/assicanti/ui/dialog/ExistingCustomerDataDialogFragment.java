@@ -19,6 +19,7 @@ public class ExistingCustomerDataDialogFragment extends DialogFragment {
 
     public static ExistingCustomerDataDialogFragment newInstance(YesNoDialogListener dialogListener){
         ExistingCustomerDataDialogFragment frag = new ExistingCustomerDataDialogFragment();
+        frag.setListener(dialogListener);
         return frag;
     }
 
@@ -46,5 +47,9 @@ public class ExistingCustomerDataDialogFragment extends DialogFragment {
                 })
                 .create();
 
+    }
+
+    public void setListener(YesNoDialogListener listener) {
+        this.listener = listener;
     }
 }

@@ -2,7 +2,6 @@ package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
@@ -13,7 +12,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.CustomerData;
+import com.nunoneto.assicanti.model.DataModel;
+import com.nunoneto.assicanti.model.entity.CustomerData;
 import com.nunoneto.assicanti.ui.dialog.ExistingCustomerDataDialogFragment;
 import com.nunoneto.assicanti.ui.dialog.YesNoDialogListener;
 
@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -52,7 +51,7 @@ public class CustomerDataFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_customer_data, container, false);
 
@@ -92,6 +91,18 @@ public class CustomerDataFragment extends Fragment {
                 }
                 if(validForm){
                     saveCustomerData();
+                    DataModel.getInstance().getCurrentOrder().setCustomerData(
+                            new CustomerData(
+                                name.getText().toString(),
+                                contact.getText().toString(),
+                                comment.getText() != null ? comment.getText().toString() : "",
+                                nif.getText() != null ? nif.getText().toString() : "",
+                                address.getText().toString(),
+                                companyCode.getText().toString(),
+                                email.getText().toString(),
+                                new Date()
+                            )
+                    );
                     mListener.goToSummary();
                 }
 

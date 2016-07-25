@@ -1,4 +1,4 @@
-package com.nunoneto.assicanti.model;
+package com.nunoneto.assicanti.model.entity;
 
 import io.realm.RealmObject;
 

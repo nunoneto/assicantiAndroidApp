@@ -1,4 +1,4 @@
-package com.nunoneto.assicanti.model;
+package com.nunoneto.assicanti.model.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,9 @@ public class OptionalGroup {
     private String name;
     private String multiType;
     private List<OptionalItem> items = new ArrayList<>();
+
+    public OptionalGroup() {
+    }
 
     public void setName(String name) {
         this.name = name;

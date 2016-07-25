@@ -1,10 +1,7 @@
-package com.nunoneto.assicanti.model;
+package com.nunoneto.assicanti.model.entity;
 
-import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by NB20301 on 12/07/2016.
