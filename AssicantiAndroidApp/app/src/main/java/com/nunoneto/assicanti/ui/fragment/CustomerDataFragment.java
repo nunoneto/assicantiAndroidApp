@@ -17,6 +17,7 @@ import com.nunoneto.assicanti.model.CustomerData;
 import com.nunoneto.assicanti.ui.dialog.ExistingCustomerDataDialogFragment;
 import com.nunoneto.assicanti.ui.dialog.YesNoDialogListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -64,6 +65,7 @@ public class CustomerDataFragment extends Fragment {
         address = (EditText) view.findViewById(R.id.address);
         confirmOrderButton = (AppCompatButton) view.findViewById(R.id.confirmOrder);
 
+        mandatoryFields = new ArrayList<>();
         mandatoryFields.add(name);
         mandatoryFields.add(contact);
         mandatoryFields.add(email);
@@ -142,7 +144,7 @@ public class CustomerDataFragment extends Fragment {
             customerData.setContact(contact.getText().toString());
             customerData.setEmail(email.getText().toString());
             customerData.setNif(nif.getText() != null? nif.getText().toString() : "");
-            customerData.setInsetedAt(new Date());
+            customerData.setInsertedAt(new Date());
 
         }catch (Exception e){
             e.printStackTrace();

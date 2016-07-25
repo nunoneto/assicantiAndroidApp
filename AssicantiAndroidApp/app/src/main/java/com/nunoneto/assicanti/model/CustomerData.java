@@ -10,7 +10,7 @@ import io.realm.RealmObject;
 public class CustomerData extends RealmObject {
 
     private String name, contact, comment, nif, address, companyCode, email;
-    private Date insetedAt;
+    private Date insertedAt;
 
     public String getName() {
         return name;
@@ -68,11 +68,11 @@ public class CustomerData extends RealmObject {
         this.email = email;
     }
 
-    public Date getInsetedAt() {
-        return insetedAt;
+    public Date getInsertedAt() {
+        return insertedAt;
     }
 
-    public void setInsetedAt(Date insetedAt) {
-        this.insetedAt = insetedAt;
+    public void setInsertedAt(Date insertedAt) {
+        this.insertedAt = insertedAt;
     }
 }
