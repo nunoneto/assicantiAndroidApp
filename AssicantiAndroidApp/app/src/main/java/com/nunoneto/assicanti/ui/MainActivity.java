@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.entity.OrderPhase;
@@ -94,7 +95,14 @@ public class MainActivity extends AppCompatActivity
 
     private void updateNavigation(int orderPhase){
         this.orderPhase = orderPhase;
-        this.toggle.setDrawerIndicatorEnabled(orderPhase > OrderPhase.MENU ? false : true);
+        if(orderPhase > OrderPhase.MENU){
+
+        }else{
+
+            getSupportActionBar().setHomeButtonEnabled(false);
+            toggle.syncState();
+        }
+
     }
 
     @Override

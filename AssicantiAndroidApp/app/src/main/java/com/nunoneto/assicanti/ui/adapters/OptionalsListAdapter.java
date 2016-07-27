@@ -19,10 +19,12 @@ public class OptionalsListAdapter extends RecyclerView.Adapter<OptionalsListAdap
 
     private List<OptionalItem> optionalItemList;
     private OptionalItemClickListener listener;
+    private int size;
 
     public OptionalsListAdapter(List<OptionalItem> optionalItemList, OptionalItemClickListener listener) {
         this.optionalItemList = optionalItemList;
         this.listener = listener;
+        this.size = optionalItemList.size();
     }
 
     public class ViewHoler extends RecyclerView.ViewHolder {
@@ -51,7 +53,7 @@ public class OptionalsListAdapter extends RecyclerView.Adapter<OptionalsListAdap
     @Override
     public void onBindViewHolder(ViewHoler holder, final int position) {
         holder.appCompatCheckBox.setText(
-                optionalItemList.get(position).getName()
+                optionalItemList.get(position).getName() + " " +optionalItemList.get(position).getPrice()
         );
         holder.appCompatCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -63,7 +65,7 @@ public class OptionalsListAdapter extends RecyclerView.Adapter<OptionalsListAdap
 
     @Override
     public int getItemCount() {
-        return optionalItemList.size();
+        return this.size;
     }
 
 }

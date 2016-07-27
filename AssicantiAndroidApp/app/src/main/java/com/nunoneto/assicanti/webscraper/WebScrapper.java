@@ -210,13 +210,16 @@ public class WebScrapper {
                 for (Element item : items){
 
                     String[] id = item.id().split("-");
+                    Elements price = item.select(".wppizza-doingredient-price");
 
+                    item.select("label.wppizza-doingredient-lbl > .wppizza-doingredient-price").remove();
                     OptionalItem optional = new OptionalItem(
                             item.select("label.wppizza-doingredient-lbl").first().text(),
                             id[3],
                             id[5],
                             id[2],
-                            id[4]
+                            id[4],
+                            price != null && price.size() > 0 ? price.first().text() : ""
                     );
                     group.getItems().add(optional);
 

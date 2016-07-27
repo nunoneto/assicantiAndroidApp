@@ -12,16 +12,18 @@ public class OptionalItem extends RealmObject {
     private String groupId;
     private String multiId;
     private String multiType;
+    private String price;
 
     public OptionalItem() {
     }
 
-    public OptionalItem(String name, String itemId, String groupId, String multiId, String multiType) {
+    public OptionalItem(String name, String itemId, String groupId, String multiId, String multiType, String price) {
         this.name = name;
         this.itemId = itemId;
         this.groupId = groupId;
         this.multiId = multiId;
         this.multiType = multiType;
+        this.price = price;
     }
 
     public String getName() {
@@ -62,5 +64,13 @@ public class OptionalItem extends RealmObject {
 
     public void setMultiType(String multiType) {
         this.multiType = multiType;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 }

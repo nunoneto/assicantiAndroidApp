@@ -2,6 +2,7 @@ package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.ContentLoadingProgressBar;
@@ -76,6 +77,11 @@ public class ListOptionalsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         optionalsRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
         optionalsRecyclerView.setHasFixedSize(true);
         optionalsRecyclerView.setAdapter(new OptionalsListAdapter(
@@ -94,6 +100,7 @@ public class ListOptionalsFragment extends Fragment {
                 }
         ));
         contentLoadingProgressBar.hide();
+
     }
 
     private void addRemoveIngredient(OptionalItem item, final CompoundButton compoundButton, final boolean checked ){

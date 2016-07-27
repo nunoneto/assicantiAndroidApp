@@ -19,12 +19,14 @@
         >
 
         <TextView
+            android:id="@+id/itemName"
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Item"/>
 
         <TextView
+            android:id="@+id/itemValue"
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="wrap_content"

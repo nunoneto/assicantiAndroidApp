@@ -97,6 +97,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
             }
         });
         contentLoadingProgressBar = (ContentLoadingProgressBar)view.findViewById(R.id.loading);
+        contentLoadingProgressBar.bringToFront();
         contentLoadingProgressBar.show();
         return view;
     }
@@ -144,6 +145,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
         tabLayout.setupWithViewPager(viewPager);
         contentLoadingProgressBar.hide();
         nextButton.setEnabled(true);
+        contentLoadingProgressBar.bringToFront();
     }
 
     @Override

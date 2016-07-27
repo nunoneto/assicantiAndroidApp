@@ -135,11 +135,11 @@ public class CustomerDataFragment extends Fragment {
                 }
                 @Override
                 public void no() {
+                    realm.close();
                 }
             });
             dialog.show(getActivity().getFragmentManager(),ExistingCustomerDataDialogFragment.TAG);
         }
-        realm.close();
 
     }
 
