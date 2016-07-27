@@ -9,6 +9,7 @@ import com.nunoneto.assicanti.model.entity.MenuTypeImage;
 import com.nunoneto.assicanti.model.entity.OptionalGroup;
 import com.nunoneto.assicanti.model.entity.OptionalItem;
 import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.SendOrderResult;
 import com.nunoneto.assicanti.model.entity.WeekMenu;
 import com.nunoneto.assicanti.model.entity.Type;
 
@@ -365,6 +366,38 @@ public class WebScrapper {
 
     }
 
+
+    public String parseRegisterOrder(String html){
+        try{
+            Document doc = Jsoup.parse(html);
+
+            String hash = doc.select("input").first().attr("value");
+
+            return hash;
+        }catch (Exception e){
+            Log.e(TAG,"Could not parse send order page");
+            e.printStackTrace();
+        }
+        return "";
+
+    }
+
+    public SendOrderResult parseSendOrder(String sendOrderHtml){
+
+        try{
+            Document doc = Jsoup.parse(sendOrderHtml);
+
+            return new SendOrderResult(
+                    doc.select("p:nth-of-type(1) > strong ").first().text(),
+                    doc.select("p:nth-of-type(2) > strong ").first().text()
+            );
+
+        }catch (Exception e){
+            Log.e(TAG,"Could not parse send order page");
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
 

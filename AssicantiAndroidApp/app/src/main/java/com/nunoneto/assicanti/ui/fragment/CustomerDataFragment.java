@@ -2,10 +2,13 @@ package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +17,12 @@ import android.widget.EditText;
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.entity.CustomerData;
+import com.nunoneto.assicanti.model.entity.SendOrderResult;
+import com.nunoneto.assicanti.network.RequestConstants;
+import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.ui.dialog.ExistingCustomerDataDialogFragment;
 import com.nunoneto.assicanti.ui.dialog.YesNoDialogListener;
+import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +31,9 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CustomerDataFragment extends Fragment {
 
@@ -35,6 +45,7 @@ public class CustomerDataFragment extends Fragment {
     private EditText name,address,companyCode,comment,email,contact,nif;
     private AppCompatButton confirmOrderButton;
     List<EditText> mandatoryFields;
+    private ContentLoadingProgressBar contentLoadingProgressBar;
 
     public CustomerDataFragment() {}
 
@@ -63,6 +74,8 @@ public class CustomerDataFragment extends Fragment {
         nif = (EditText) view.findViewById(R.id.nif);
         address = (EditText) view.findViewById(R.id.address);
         confirmOrderButton = (AppCompatButton) view.findViewById(R.id.confirmOrder);
+        contentLoadingProgressBar = (ContentLoadingProgressBar) view.findViewById(R.id.loading);
+        contentLoadingProgressBar.hide();
 
         mandatoryFields = new ArrayList<>();
         mandatoryFields.add(name);
@@ -103,13 +116,80 @@ public class CustomerDataFragment extends Fragment {
                                 new Date()
                             )
                     );
-                    mListener.goToSummary();
+                    checkIfOpen();
                 }
 
             }
         });
 
         return view;
+    }
+
+    private void checkIfOpen(){
+        contentLoadingProgressBar.show();
+
+        RestService.getInstance().getAssicantiService()
+                .checkifopen(
+                        RequestConstants.CheckIfOpen.ACTION,
+                        RequestConstants.CheckIfOpen.TYPE
+                ).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                submitOrder();
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Snackbar.make(getView(),"Não foi possível submeter a encomenda",Snackbar.LENGTH_LONG).show();
+                Log.e(TAG,"Failed to checkIfOpen");
+                t.printStackTrace();
+                contentLoadingProgressBar.hide();
+            }
+        });
+
+    }
+
+    private void submitOrder() {
+        CustomerData data = DataModel.getInstance().getCurrentOrder().getCustomerData();
+        RestService.getInstance().getAssicantiService()
+                .sendOrder(
+                        RequestConstants.SendOrder.ACTION,
+                        RequestConstants.SendOrder.TYPE,
+                        RequestConstants.SendOrder.buildFormQuery(
+                            data.getName(),
+                            data.getEmail(),
+                            data.getAddress(),
+                            data.getContact(),
+                            data.getComment(),
+                            data.getCompanyCode(),
+                            data.getNif()
+                        )
+                )
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        SendOrderResult sendOrderResult = WebScrapper.getInstance().parseSendOrder(response.body());
+                        saveOrder();
+                        mListener.goToSummary(sendOrderResult.getOrderId(),sendOrderResult.getData());
+                        contentLoadingProgressBar.hide();
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Snackbar.make(getView(),"Não foi possível submeter a encomenda",Snackbar.LENGTH_LONG).show();
+                        Log.e(TAG,"Failed to submitOrder");
+                        t.printStackTrace();
+                        contentLoadingProgressBar.hide();
+                    }
+                });
+    }
+
+    private void saveOrder() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.copyToRealm(DataModel.getInstance().getCurrentOrder());
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override

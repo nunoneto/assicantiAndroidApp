@@ -131,13 +131,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void goToSummary() {
+    public void goToSummary(String orderNumber, String deliveryDate) {
         updateNavigation(OrderPhase.SUMMARY);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.container, OrderSummaryFragment.newInstance(),OrderSummaryFragment.TAG)
+                .add(R.id.container, OrderSummaryFragment.newInstance(orderNumber,deliveryDate),OrderSummaryFragment.TAG)
                 .addToBackStack(null)
                 .commit();
+
     }
+
 
 }

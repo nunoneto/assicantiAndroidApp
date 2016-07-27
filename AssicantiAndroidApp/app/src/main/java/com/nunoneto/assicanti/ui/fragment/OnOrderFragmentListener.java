@@ -13,5 +13,5 @@ public interface OnOrderFragmentListener {
 
     void setTitle(String title);
 
-    void goToSummary();
+    void goToSummary(String orderNumber, String deliveryDate);
 }

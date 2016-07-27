@@ -24,6 +24,7 @@ import com.nunoneto.assicanti.network.response.AddToCart2Response;
 import com.nunoneto.assicanti.network.response.GetOptionalsResponse;
 import com.nunoneto.assicanti.tasks.GetOptionalsTask;
 import com.nunoneto.assicanti.ui.adapters.OptionalsPagerAdapter;
+import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,8 +196,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
                 ).enqueue(new Callback<AddToCart2Response>() {
             @Override
             public void onResponse(Call<AddToCart2Response> call, Response<AddToCart2Response> response) {
-                contentLoadingProgressBar.hide();
-                mListener.showForm();
+                register();
             }
 
             @Override
@@ -208,6 +208,31 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
 
             }
         });
+    }
+
+    private void register(){
+        RestService.getInstance().getAssicantiService()
+                .register(
+                        RequestConstants.Register.ACTION,
+                        RequestConstants.Register.TYPE,
+                        RequestConstants.Register.VAL
+                )
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        String hash = WebScrapper.getInstance().parseRegisterOrder(response.body());
+                        contentLoadingProgressBar.hide();
+                        mListener.showForm();
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Log.e(TAG,"Could not complete register with cause: ");
+                        t.printStackTrace();
+                        contentLoadingProgressBar.hide();
+                        Snackbar.make(getView(),"Não foi possível completar o pedido. Por favor tente mais tarde",Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
