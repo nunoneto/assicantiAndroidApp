@@ -149,4 +149,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"></LinearLayout>
     </ScrollView>
+
+    <android.support.v7.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableRight="@drawable/ic_done_all_black_24dp"
+        android:drawablePadding="10dp"
+        android:text="Sair"
+        />
 </LinearLayout>

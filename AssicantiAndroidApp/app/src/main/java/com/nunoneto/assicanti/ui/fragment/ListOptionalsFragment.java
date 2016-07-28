@@ -16,7 +16,7 @@ import android.widget.CompoundButton;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.entity.OptionalItem;
+import com.nunoneto.assicanti.model.entity.realm.OptionalItem;
 import com.nunoneto.assicanti.network.RequestConstants;
 import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.network.response.AddOptionalResponse;

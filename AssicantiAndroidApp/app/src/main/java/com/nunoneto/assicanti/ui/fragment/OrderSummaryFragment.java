@@ -1,7 +1,6 @@
 package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,9 +13,9 @@ import android.widget.TextView;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.entity.DayMenu;
-import com.nunoneto.assicanti.model.entity.OptionalItem;
-import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.realm.DayMenu;
+import com.nunoneto.assicanti.model.entity.realm.OptionalItem;
+import com.nunoneto.assicanti.model.entity.realm.Price;
 
 public class OrderSummaryFragment extends Fragment {
 

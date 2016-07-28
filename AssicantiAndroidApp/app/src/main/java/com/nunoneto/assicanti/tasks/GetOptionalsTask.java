@@ -2,7 +2,7 @@ package com.nunoneto.assicanti.tasks;
 
 import android.os.AsyncTask;
 
-import com.nunoneto.assicanti.model.entity.OptionalGroup;
+import com.nunoneto.assicanti.model.entity.realm.OptionalGroup;
 import com.nunoneto.assicanti.ui.fragment.OptionalsFragment;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
 

@@ -1,11 +1,11 @@
 package com.nunoneto.assicanti.model;
 
 import com.nunoneto.assicanti.Utils;
-import com.nunoneto.assicanti.model.entity.DayMenu;
-import com.nunoneto.assicanti.model.entity.MenuType;
-import com.nunoneto.assicanti.model.entity.OptionalGroup;
-import com.nunoneto.assicanti.model.entity.Order;
-import com.nunoneto.assicanti.model.entity.WeekMenu;
+import com.nunoneto.assicanti.model.entity.realm.DayMenu;
+import com.nunoneto.assicanti.model.entity.realm.MenuType;
+import com.nunoneto.assicanti.model.entity.realm.OptionalGroup;
+import com.nunoneto.assicanti.model.entity.realm.Order;
+import com.nunoneto.assicanti.model.entity.realm.WeekMenu;
 
 import java.util.Calendar;
 import java.util.Date;

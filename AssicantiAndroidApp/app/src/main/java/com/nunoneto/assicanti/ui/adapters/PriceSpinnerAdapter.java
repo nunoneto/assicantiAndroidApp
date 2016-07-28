@@ -1,7 +1,7 @@
 package com.nunoneto.assicanti.ui.adapters;
 
 import com.nunoneto.assicanti.R;
-import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.realm.Price;
 
 import android.content.Context;
 import android.view.LayoutInflater;

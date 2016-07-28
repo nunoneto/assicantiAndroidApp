@@ -24,10 +24,10 @@ import android.widget.TextView;
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.Utils;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.entity.DayMenu;
-import com.nunoneto.assicanti.model.entity.MenuType;
-import com.nunoneto.assicanti.model.entity.Order;
-import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.realm.DayMenu;
+import com.nunoneto.assicanti.model.entity.realm.MenuType;
+import com.nunoneto.assicanti.model.entity.realm.Order;
+import com.nunoneto.assicanti.model.entity.realm.Price;
 import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.tasks.GetMenusTask;
 import com.nunoneto.assicanti.ui.adapters.PriceSpinnerAdapter;
@@ -35,8 +35,6 @@ import com.nunoneto.assicanti.ui.adapters.PriceSpinnerAdapter;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
-
-import io.realm.Realm;
 
 public class MenuFragment extends Fragment {
 

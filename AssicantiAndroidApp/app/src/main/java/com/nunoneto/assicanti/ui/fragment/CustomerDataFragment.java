@@ -18,7 +18,7 @@ import android.widget.EditText;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.entity.CustomerData;
+import com.nunoneto.assicanti.model.entity.realm.CustomerData;
 import com.nunoneto.assicanti.model.entity.SendOrderCodes;
 import com.nunoneto.assicanti.model.entity.SendOrderResult;
 import com.nunoneto.assicanti.network.RequestConstants;

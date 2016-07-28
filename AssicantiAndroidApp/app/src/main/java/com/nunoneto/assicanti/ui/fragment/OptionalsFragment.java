@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.entity.OptionalGroup;
+import com.nunoneto.assicanti.model.entity.realm.OptionalGroup;
 import com.nunoneto.assicanti.network.RequestConstants;
 import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.network.response.AddToCart1Response;

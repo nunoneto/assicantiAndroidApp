@@ -3,15 +3,15 @@ package com.nunoneto.assicanti.webscraper;
 import android.util.Log;
 
 import com.nunoneto.assicanti.model.DataModel;
-import com.nunoneto.assicanti.model.entity.DayMenu;
-import com.nunoneto.assicanti.model.entity.MenuType;
-import com.nunoneto.assicanti.model.entity.MenuTypeImage;
-import com.nunoneto.assicanti.model.entity.OptionalGroup;
-import com.nunoneto.assicanti.model.entity.OptionalItem;
-import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.realm.DayMenu;
+import com.nunoneto.assicanti.model.entity.realm.MenuType;
+import com.nunoneto.assicanti.model.entity.realm.MenuTypeImage;
+import com.nunoneto.assicanti.model.entity.realm.OptionalGroup;
+import com.nunoneto.assicanti.model.entity.realm.OptionalItem;
+import com.nunoneto.assicanti.model.entity.realm.Price;
 import com.nunoneto.assicanti.model.entity.SendOrderCodes;
 import com.nunoneto.assicanti.model.entity.SendOrderResult;
-import com.nunoneto.assicanti.model.entity.WeekMenu;
+import com.nunoneto.assicanti.model.entity.realm.WeekMenu;
 import com.nunoneto.assicanti.model.entity.Type;
 
 import org.jsoup.Jsoup;
