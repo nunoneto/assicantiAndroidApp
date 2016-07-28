@@ -9,6 +9,7 @@ import com.nunoneto.assicanti.model.entity.MenuTypeImage;
 import com.nunoneto.assicanti.model.entity.OptionalGroup;
 import com.nunoneto.assicanti.model.entity.OptionalItem;
 import com.nunoneto.assicanti.model.entity.Price;
+import com.nunoneto.assicanti.model.entity.SendOrderCodes;
 import com.nunoneto.assicanti.model.entity.SendOrderResult;
 import com.nunoneto.assicanti.model.entity.WeekMenu;
 import com.nunoneto.assicanti.model.entity.Type;
@@ -397,6 +398,22 @@ public class WebScrapper {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public SendOrderCodes getSendOrderHash(){
+        try{
+            Document doc = Jsoup.connect("http://assicanti.pt/finalizar-encomenda/").timeout(JSOUP_TIMEOUT).get();
+
+            return new SendOrderCodes(
+                doc.select("input#wppizza_hash").first().val(),
+                doc.select("input#wppizza-gateway-cod").first().val()
+            );
+
+        }catch (Exception e){
+            Log.e(TAG,"Could not get order hash");
+            e.printStackTrace();
+        }
+            return null;
     }
 
 

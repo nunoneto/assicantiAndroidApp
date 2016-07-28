@@ -55,7 +55,9 @@ public class RequestConstants {
         public static final String TYPE = "sendorder";
 
         public static String buildFormQuery(
-                String name, String email, String address, String contact, String comments, String companyCode, String nif, String hash){
+                String name, String email, String address, String contact, String comments,
+                String companyCode, String nif, String cod, String hash){
+
             StringBuilder sb = new StringBuilder();
             sb.append("cname="+name+"&");
             sb.append("cemail="+email+"&");
@@ -64,7 +66,7 @@ public class RequestConstants {
             sb.append("ccustom1="+comments+"&");
             sb.append("ccustom1="+companyCode+"&");
             sb.append("ccustom2="+nif+"&");
-            sb.append("wppizza-gateway=cod&");
+            sb.append("wppizza-gateway="+cod+"&");
             sb.append("wppizza_hash="+hash);
 
             try {

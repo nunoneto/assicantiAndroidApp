@@ -1,7 +1,9 @@
 package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
@@ -17,9 +19,11 @@ import android.widget.EditText;
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.entity.CustomerData;
+import com.nunoneto.assicanti.model.entity.SendOrderCodes;
 import com.nunoneto.assicanti.model.entity.SendOrderResult;
 import com.nunoneto.assicanti.network.RequestConstants;
 import com.nunoneto.assicanti.network.RestService;
+import com.nunoneto.assicanti.tasks.GetSendOrderTask;
 import com.nunoneto.assicanti.ui.dialog.ExistingCustomerDataDialogFragment;
 import com.nunoneto.assicanti.ui.dialog.YesNoDialogListener;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
@@ -41,11 +45,16 @@ public class CustomerDataFragment extends Fragment {
 
     private OnOrderFragmentListener mListener;
 
+    // Tasks
+    private GetSendOrderTask task;
+
     // Views
     private EditText name,address,companyCode,comment,email,contact,nif;
     private AppCompatButton confirmOrderButton;
     List<EditText> mandatoryFields;
     private ContentLoadingProgressBar contentLoadingProgressBar;
+
+    private SendOrderCodes sendOrderCodes;
 
     public CustomerDataFragment() {}
 
@@ -125,6 +134,25 @@ public class CustomerDataFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        task = new GetSendOrderTask(this);
+        task.execute();
+    }
+
+    public void setSendOrderCodes(SendOrderCodes codes){
+        this.sendOrderCodes = codes;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(task != null && (task.getStatus() == AsyncTask.Status.PENDING || task.getStatus() == AsyncTask.Status.RUNNING))
+            task.cancel(true);
+    }
+
     private void checkIfOpen(){
         contentLoadingProgressBar.show();
 
@@ -162,7 +190,9 @@ public class CustomerDataFragment extends Fragment {
                             data.getContact(),
                             data.getComment(),
                             data.getCompanyCode(),
-                            data.getNif()
+                            data.getNif(),
+                            sendOrderCodes != null? sendOrderCodes.getCod() : "",
+                            sendOrderCodes != null? sendOrderCodes.getHash() : ""
                         )
                 )
                 .enqueue(new Callback<String>() {
