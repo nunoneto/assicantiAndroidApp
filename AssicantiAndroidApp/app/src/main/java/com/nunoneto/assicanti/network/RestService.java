@@ -68,4 +68,8 @@ public class RestService {
     public void clearCookies(){
         this.cookieStore.clear();
     }
+
+    public HashMap<HttpUrl, List<Cookie>> getCookieStore() {
+        return cookieStore;
+    }
 }

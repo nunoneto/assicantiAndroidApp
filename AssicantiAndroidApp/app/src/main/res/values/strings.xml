@@ -19,6 +19,9 @@
     <!-- dialog existing customer data -->
     <string name="dialog_customerdata_title">Deseja usar os dados da encomenda anterior?</string>
 
+    <!-- dialog exit app -->
+    <string name="dialog_exitapp_title">Deseja sair da aplicação?</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

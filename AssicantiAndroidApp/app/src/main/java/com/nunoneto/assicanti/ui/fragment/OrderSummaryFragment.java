@@ -1,9 +1,11 @@
 package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.entity.realm.DayMenu;
 import com.nunoneto.assicanti.model.entity.realm.OptionalItem;
 import com.nunoneto.assicanti.model.entity.realm.Price;
+import com.nunoneto.assicanti.ui.DayMenuActivity;
 
 public class OrderSummaryFragment extends Fragment {
 
@@ -27,6 +30,7 @@ public class OrderSummaryFragment extends Fragment {
     private LinearLayout orderDetailContainer;
     private TextView orderNumberTxt, deliveryDateTxt, totalAmountTxt;
     private String orderNumber, deliveryDate;
+    private AppCompatButton finishFlow;
 
     private OnOrderFragmentListener mListener;
 
@@ -62,6 +66,17 @@ public class OrderSummaryFragment extends Fragment {
 
         deliveryDateTxt.setText(deliveryDate);
         orderNumberTxt.setText(orderNumber);
+
+        finishFlow = (AppCompatButton)root.findViewById(R.id.finishFlow);
+        finishFlow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(
+                        new Intent(getActivity(), DayMenuActivity.class)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                );
+            }
+        });
 
         return root;
     }

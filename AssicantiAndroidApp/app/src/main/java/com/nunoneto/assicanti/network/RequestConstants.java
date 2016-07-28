@@ -70,8 +70,9 @@ public class RequestConstants {
             sb.append("wppizza_hash="+hash);
 
             try {
-                return URLEncoder.encode(sb.toString(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
+                //return URLEncoder.encode(sb.toString(), "UTF-8");
+                return sb.toString();
+            } catch (Exception e) {
                 e.printStackTrace();
                 return sb.toString();
             }

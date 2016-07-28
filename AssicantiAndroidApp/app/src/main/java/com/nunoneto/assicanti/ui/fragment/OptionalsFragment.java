@@ -22,6 +22,7 @@ import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.network.response.AddToCart1Response;
 import com.nunoneto.assicanti.network.response.AddToCart2Response;
 import com.nunoneto.assicanti.network.response.GetOptionalsResponse;
+import com.nunoneto.assicanti.tasks.DoRegisterRequestTask;
 import com.nunoneto.assicanti.tasks.GetOptionalsTask;
 import com.nunoneto.assicanti.ui.adapters.OptionalsPagerAdapter;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
@@ -46,13 +47,16 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
     public static final String PARAM_PRICE_ID = "PARAM_PRICE_ID";
 
     private String itemId, size, tier, priceId;
-    private GetOptionalsTask getOptionalsTask;
 
     //View
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ContentLoadingProgressBar contentLoadingProgressBar;
     private AppCompatButton nextButton;
+
+    // Tasks
+    private GetOptionalsTask getOptionalsTask;
+    private DoRegisterRequestTask doRegisterRequestTask;
 
     public OptionalsFragment() {
     }
@@ -117,36 +121,40 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
 
     @Override
     public void onFailure(Call<GetOptionalsResponse> call, Throwable t) {
+        contentLoadingProgressBar.hide();
         Log.e(TAG,"Failed to get ingredients with reason:");
         t.printStackTrace();
         Snackbar.make(getView(),"Não foi possível carregar os pedidos opcionais",Snackbar.LENGTH_LONG).show();
     }
 
     public void loadOptionals(List<OptionalGroup> optionalGroupList){
+        if(this.isAdded()){
 
-        DataModel.getInstance().setOptionalGroups(optionalGroupList);
-        List<Fragment> fragments = new ArrayList<>();
-        String[] tabTitles = new String[optionalGroupList.size()];
-        for(int i = 0;i<optionalGroupList.size();i++){
-            OptionalGroup group = optionalGroupList.get(i);
+            DataModel.getInstance().setOptionalGroups(optionalGroupList);
+            List<Fragment> fragments = new ArrayList<>();
+            String[] tabTitles = new String[optionalGroupList.size()];
+            for(int i = 0;i<optionalGroupList.size();i++){
+                OptionalGroup group = optionalGroupList.get(i);
 
-            TabLayout.Tab tab = tabLayout.newTab()
-                    .setText(group.getName())
-                    .setContentDescription(group.getName());
-            tabLayout.addTab(tab);
+                TabLayout.Tab tab = tabLayout.newTab()
+                        .setText(group.getName())
+                        .setContentDescription(group.getName());
+                tabLayout.addTab(tab);
 
-            ListOptionalsFragment frag = ListOptionalsFragment.newInstance(i,itemId);
-            fragments.add(frag);
-            tabTitles[i] = group.getName();
+                ListOptionalsFragment frag = ListOptionalsFragment.newInstance(i,itemId);
+                fragments.add(frag);
+                tabTitles[i] = group.getName();
+            }
+            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+            OptionalsPagerAdapter adapter = new OptionalsPagerAdapter(getActivity().getSupportFragmentManager(),fragments,tabTitles);
+
+            viewPager.setAdapter(adapter);
+            tabLayout.setupWithViewPager(viewPager);
+            contentLoadingProgressBar.hide();
+            nextButton.setEnabled(true);
+            contentLoadingProgressBar.bringToFront();
+
         }
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        OptionalsPagerAdapter adapter = new OptionalsPagerAdapter(getActivity().getSupportFragmentManager(),fragments,tabTitles);
-
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        contentLoadingProgressBar.hide();
-        nextButton.setEnabled(true);
-        contentLoadingProgressBar.bringToFront();
     }
 
     @Override
@@ -154,6 +162,9 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
         super.onStop();
         if(getOptionalsTask != null && (getOptionalsTask.getStatus() == AsyncTask.Status.PENDING || getOptionalsTask.getStatus() == AsyncTask.Status.RUNNING)){
             getOptionalsTask.cancel(true);
+        }
+        if(doRegisterRequestTask != null && (doRegisterRequestTask.getStatus() == AsyncTask.Status.PENDING || doRegisterRequestTask.getStatus() == AsyncTask.Status.RUNNING)){
+            doRegisterRequestTask.cancel(true);
         }
     }
 
@@ -201,9 +212,9 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
 
             @Override
             public void onFailure(Call<AddToCart2Response> call, Throwable t) {
+                contentLoadingProgressBar.hide();
                 Log.e(TAG,"Could not complete addToCart 2 with cause: ");
                 t.printStackTrace();
-                contentLoadingProgressBar.hide();
                 Snackbar.make(getView(),"Não foi possível completar o pedido. Por favor tente mais tarde",Snackbar.LENGTH_SHORT).show();
 
             }
@@ -211,29 +222,16 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
     }
 
     private void register(){
-        RestService.getInstance().getAssicantiService()
-                .register(
-                        RequestConstants.Register.ACTION,
-                        RequestConstants.Register.TYPE,
-                        RequestConstants.Register.VAL
-                )
-                .enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        String hash = WebScrapper.getInstance().parseRegisterOrder(response.body());
-                        contentLoadingProgressBar.hide();
-                        mListener.showForm();
-                    }
-
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Log.e(TAG,"Could not complete register with cause: ");
-                        t.printStackTrace();
-                        contentLoadingProgressBar.hide();
-                        Snackbar.make(getView(),"Não foi possível completar o pedido. Por favor tente mais tarde",Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+        doRegisterRequestTask = new DoRegisterRequestTask(OptionalsFragment.this);
+        doRegisterRequestTask.execute();
     }
+
+    public void onRegisterResponse(String hash){
+        contentLoadingProgressBar.hide();
+        mListener.showForm();
+    }
+
+
 
     @Override
     public void onAttach(Context context) {

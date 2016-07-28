@@ -68,7 +68,7 @@ public interface AssicantiService {
 
     @FormUrlEncoded
     @POST("/wp-admin/admin-ajax.php")
-    Call checkifopen(
+    Call<String[]> checkifopen(
             @Field("action") String action,
             @Field("vars[type]") String type
     );

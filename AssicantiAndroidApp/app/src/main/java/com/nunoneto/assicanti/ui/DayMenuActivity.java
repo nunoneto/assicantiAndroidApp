@@ -12,7 +12,7 @@ import com.nunoneto.assicanti.ui.fragment.OnOrderFragmentListener;
 import com.nunoneto.assicanti.ui.fragment.OptionalsFragment;
 import com.nunoneto.assicanti.ui.fragment.OrderSummaryFragment;
 
-public class MainActivity extends NavigationDrawerActivity
+public class DayMenuActivity extends NavigationDrawerActivity
         implements OnOrderFragmentListener {
 
     private int orderPhase;

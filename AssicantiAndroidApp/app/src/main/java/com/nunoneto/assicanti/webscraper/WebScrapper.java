@@ -13,7 +13,10 @@ import com.nunoneto.assicanti.model.entity.SendOrderCodes;
 import com.nunoneto.assicanti.model.entity.SendOrderResult;
 import com.nunoneto.assicanti.model.entity.realm.WeekMenu;
 import com.nunoneto.assicanti.model.entity.Type;
+import com.nunoneto.assicanti.network.RequestConstants;
+import com.nunoneto.assicanti.network.RestService;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -37,6 +40,12 @@ import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import okhttp3.Cookie;
+import okhttp3.HttpUrl;
+import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
 
 /**
  * Created by NB20301 on 12/07/2016.
@@ -367,10 +376,16 @@ public class WebScrapper {
 
     }
 
-
-    public String parseRegisterOrder(String html){
+    public String parseRegisterOrder(){
         try{
-            Document doc = Jsoup.parse(html);
+
+            Connection conn = Jsoup.connect("http://assicanti.pt/wp-admin/admin-ajax.php")
+                    .data("action", RequestConstants.Register.ACTION)
+                    .data("vars[type]", RequestConstants.Register.TYPE)
+                    .data("vars[val]", RequestConstants.Register.VAL);
+
+            addCookies(conn);
+            Document doc = conn.timeout(JSOUP_TIMEOUT).post();
 
             String hash = doc.select("input").first().attr("value");
 
@@ -383,10 +398,14 @@ public class WebScrapper {
 
     }
 
-    public SendOrderResult parseSendOrder(String sendOrderHtml){
+    public SendOrderResult SendOrder(String data){
 
         try{
-            Document doc = Jsoup.parse(sendOrderHtml);
+            Connection conn = Jsoup.connect("http://assicanti.pt/wp-admin/admin-ajax.php").timeout(JSOUP_TIMEOUT)
+                    .data("action",RequestConstants.SendOrder.ACTION)
+                    .data("vars[type]",RequestConstants.SendOrder.TYPE)
+                    .data("vars[data]",data);
+            Document doc = conn.post();
 
             return new SendOrderResult(
                     doc.select("p:nth-of-type(1) > strong ").first().text(),
@@ -402,7 +421,10 @@ public class WebScrapper {
 
     public SendOrderCodes getSendOrderHash(){
         try{
-            Document doc = Jsoup.connect("http://assicanti.pt/finalizar-encomenda/").timeout(JSOUP_TIMEOUT).get();
+            Connection conn = Jsoup.connect("http://assicanti.pt/finalizar-encomenda/").timeout(JSOUP_TIMEOUT);
+
+            addCookies(conn);
+            Document doc = conn.get();
 
             return new SendOrderCodes(
                 doc.select("input#wppizza_hash").first().val(),
@@ -416,7 +438,13 @@ public class WebScrapper {
             return null;
     }
 
-
+    private void addCookies(Connection conn){
+        HashMap<HttpUrl,List<Cookie>> cookieStore = RestService.getInstance().getCookieStore();
+        for(HttpUrl url : cookieStore.keySet()){
+            for(Cookie cookie : cookieStore.get(url))
+                conn.cookie(cookie.name(),cookie.value());
+        }
+    }
 
 
 }

@@ -24,6 +24,7 @@ import com.nunoneto.assicanti.model.entity.SendOrderResult;
 import com.nunoneto.assicanti.network.RequestConstants;
 import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.tasks.GetSendOrderTask;
+import com.nunoneto.assicanti.tasks.SendOrderTask;
 import com.nunoneto.assicanti.ui.dialog.ExistingCustomerDataDialogFragment;
 import com.nunoneto.assicanti.ui.dialog.YesNoDialogListener;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
@@ -47,6 +48,7 @@ public class CustomerDataFragment extends Fragment {
 
     // Tasks
     private GetSendOrderTask task;
+    private SendOrderTask sendOrderTask;
 
     // Views
     private EditText name,address,companyCode,comment,email,contact,nif;
@@ -151,6 +153,8 @@ public class CustomerDataFragment extends Fragment {
         super.onStop();
         if(task != null && (task.getStatus() == AsyncTask.Status.PENDING || task.getStatus() == AsyncTask.Status.RUNNING))
             task.cancel(true);
+        if(sendOrderTask != null && (sendOrderTask.getStatus() == AsyncTask.Status.PENDING || sendOrderTask.getStatus() == AsyncTask.Status.RUNNING))
+            sendOrderTask.cancel(true);
     }
 
     private void checkIfOpen(){
@@ -178,40 +182,18 @@ public class CustomerDataFragment extends Fragment {
     }
 
     private void submitOrder() {
-        CustomerData data = DataModel.getInstance().getCurrentOrder().getCustomerData();
-        RestService.getInstance().getAssicantiService()
-                .sendOrder(
-                        RequestConstants.SendOrder.ACTION,
-                        RequestConstants.SendOrder.TYPE,
-                        RequestConstants.SendOrder.buildFormQuery(
-                            data.getName(),
-                            data.getEmail(),
-                            data.getAddress(),
-                            data.getContact(),
-                            data.getComment(),
-                            data.getCompanyCode(),
-                            data.getNif(),
-                            sendOrderCodes != null? sendOrderCodes.getCod() : "",
-                            sendOrderCodes != null? sendOrderCodes.getHash() : ""
-                        )
-                )
-                .enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        SendOrderResult sendOrderResult = WebScrapper.getInstance().parseSendOrder(response.body());
-                        saveOrder();
-                        mListener.goToSummary(sendOrderResult.getOrderId(),sendOrderResult.getData());
-                        contentLoadingProgressBar.hide();
-                    }
+        sendOrderTask = new SendOrderTask(CustomerDataFragment.this);
+        sendOrderTask.execute(sendOrderCodes);
+    }
 
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Snackbar.make(getView(),"Não foi possível submeter a encomenda",Snackbar.LENGTH_LONG).show();
-                        Log.e(TAG,"Failed to submitOrder");
-                        t.printStackTrace();
-                        contentLoadingProgressBar.hide();
-                    }
-                });
+    public void onSendOrderComplete(SendOrderResult sendOrderResult){
+        if(sendOrderResult == null){
+            saveOrder();
+            mListener.goToSummary(sendOrderResult.getOrderId(),sendOrderResult.getData());
+            contentLoadingProgressBar.hide();
+        }else{
+            Snackbar.make(getView(),"Não foi possível submeter a encomenda",Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private void saveOrder() {
