@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.nunoneto.assicanti.R;
+import com.nunoneto.assicanti.model.DataModel;
 import com.nunoneto.assicanti.model.entity.OrderPhase;
 import com.nunoneto.assicanti.model.entity.realm.Price;
 import com.nunoneto.assicanti.ui.fragment.CustomerDataFragment;
@@ -27,6 +28,10 @@ public class DayMenuActivity extends NavigationDrawerActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //clean state
+        DataModel.getInstance().setCurrentOrder(null);
+        DataModel.getInstance().setOptionalGroups(null);
 
         showMenus();
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {

@@ -189,8 +189,8 @@ public class MenuFragment extends Fragment {
                     public void onClick(View view) {
                         Price price = (Price)appCompatSpinner.getSelectedItem();
 
-                        //  build order for further reference
-                        //  e.go. reordering the same thing..
+                        //  build order for future use
+                        //  e.g. reordering the same thing..
                         Order thisOrder = new Order();
                         thisOrder.setMenuType(menuType);
                         thisOrder.setDayMenu(dayMenu);

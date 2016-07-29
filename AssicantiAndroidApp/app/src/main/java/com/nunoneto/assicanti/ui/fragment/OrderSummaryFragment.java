@@ -108,7 +108,7 @@ public class OrderSummaryFragment extends Fragment {
                 orderDetailContainer.addView(cardItem,orderDetailContainer.getChildCount());
 
                 try{
-                    totalAmount += Integer.parseInt(item.getPrice());
+                    totalAmount += Double.parseDouble(item.getPrice());
                 }catch (NumberFormatException ex){
                     // probably free item, therefore no price..
                 }
