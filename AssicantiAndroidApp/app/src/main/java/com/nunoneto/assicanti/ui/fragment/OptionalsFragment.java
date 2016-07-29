@@ -87,6 +87,10 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
         }
     }
 
+    public void toggleNextButton(boolean toggle){
+        nextButton.setEnabled(toggle);
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

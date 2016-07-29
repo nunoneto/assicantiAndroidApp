@@ -39,6 +39,8 @@ public class ListOptionalsFragment extends Fragment {
     private int position;
     private String groupId;
 
+    private OptionalsFragment parentFragment;
+
     // Views
     private RecyclerView optionalsRecyclerView;
     private ContentLoadingProgressBar contentLoadingProgressBar;
@@ -71,6 +73,8 @@ public class ListOptionalsFragment extends Fragment {
         optionalsRecyclerView = (RecyclerView)view.findViewById(R.id.optionalsRecyclerView);
         contentLoadingProgressBar = (ContentLoadingProgressBar)view.findViewById(R.id.loading);
 
+        parentFragment = (OptionalsFragment) getParentFragment();
+
         return view;
     }
 
@@ -90,12 +94,6 @@ public class ListOptionalsFragment extends Fragment {
                     @Override
                     public void onItemChecked(boolean checked, OptionalItem item, CompoundButton compoundButton) {
                         addRemoveIngredient(item,compoundButton, checked);
-
-                        if(checked) // Add
-                            DataModel.getInstance().getCurrentOrder().getOptionalItems().add(item);
-                        else        // Remove
-                            DataModel.getInstance().getCurrentOrder().getOptionalItems().remove(item);
-
                     }
                 }
         ));
@@ -103,7 +101,8 @@ public class ListOptionalsFragment extends Fragment {
 
     }
 
-    private void addRemoveIngredient(OptionalItem item, final CompoundButton compoundButton, final boolean checked ){
+    private void addRemoveIngredient(final OptionalItem item, final CompoundButton compoundButton, final boolean checked ){
+        parentFragment.toggleNextButton(false);
         contentLoadingProgressBar.show();
         compoundButton.setEnabled(false);
         RestService.getInstance().getAssicantiService()
@@ -120,6 +119,12 @@ public class ListOptionalsFragment extends Fragment {
                 Snackbar.make(getView(),checked ? "Opcional adicionado!" : "Opcional removido!",Snackbar.LENGTH_SHORT).show();
                 compoundButton.setEnabled(true);
                 contentLoadingProgressBar.hide();
+                parentFragment.toggleNextButton(true);
+
+                if(checked) // Add
+                    DataModel.getInstance().getCurrentOrder().getOptionalItems().add(item);
+                else        // Remove
+                    DataModel.getInstance().getCurrentOrder().getOptionalItems().remove(item);
             }
 
             @Override
@@ -130,6 +135,7 @@ public class ListOptionalsFragment extends Fragment {
                 compoundButton.setChecked(false);
                 compoundButton.setEnabled(true);
                 contentLoadingProgressBar.hide();
+                parentFragment.toggleNextButton(true);
             }
         });
 

@@ -24,6 +24,8 @@ public class DataModel {
 
     private static DataModel instance;
 
+    private final static int LIMIT_HOUR = 14;
+
     private List<WeekMenu> menus;
     private List<OptionalGroup> optionalGroups;
     private Order currentOrder;
@@ -54,10 +56,10 @@ public class DataModel {
         int hour = cal.get(Calendar.HOUR_OF_DAY);
 
         if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
-                || (dayOfWeek == Calendar.FRIDAY && hour > 11)) {
+                || (dayOfWeek == Calendar.FRIDAY && hour > LIMIT_HOUR)) {
             cal.add(Calendar.WEEK_OF_MONTH,1);
             cal.set(Calendar.DAY_OF_WEEK,Calendar.MONDAY);
-        }else if(hour > 11){
+        }else if(hour > LIMIT_HOUR){
             cal.add(Calendar.DAY_OF_WEEK,1);
         }
         return cal.getTime();
@@ -69,7 +71,7 @@ public class DataModel {
         int hour = cal.get(Calendar.HOUR_OF_DAY);
 
         if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
-                || (dayOfWeek == Calendar.FRIDAY && hour > 11)){
+                || (dayOfWeek == Calendar.FRIDAY && hour > LIMIT_HOUR)){
 
             int daysToAdd = 0;
             if(dayOfWeek == Calendar.FRIDAY)
@@ -97,7 +99,7 @@ public class DataModel {
         int hour = cal.get(Calendar.HOUR_OF_DAY);
 
         if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
-                || (dayOfWeek == Calendar.FRIDAY && hour > 11)){
+                || (dayOfWeek == Calendar.FRIDAY && hour > LIMIT_HOUR)){
 
             int daysToAdd = 0;
             if(dayOfWeek == Calendar.FRIDAY)
@@ -130,9 +132,9 @@ public class DataModel {
 
     /**
      * Gets the most appropriate menu
-     * If in a work day and before 11, the current day menu must be returned
-     * if in a work day and after 11, the next day's menu must be returned
-     * If in weekend or friday after 11, the next monday's menu must be returned, if available
+     * If in a work day and before LIMIT_HOUR, the current day menu must be returned
+     * if in a work day and after LIMIT_HOUR, the next day's menu must be returned
+     * If in weekend or friday after LIMIT_HOUR, the next monday's menu must be returned, if available
      * @return
      */
     public HashMap<MenuType,DayMenu> getCurrentDayMenu(){
@@ -152,7 +154,7 @@ public class DataModel {
         if(res != null && res.size() > 0){
             WeekMenu weekMenu = res.get(0);
             if(dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
-                    || (dayOfWeek == Calendar.FRIDAY && hour > 11)) {
+                    || (dayOfWeek == Calendar.FRIDAY && hour > LIMIT_HOUR)) {
 
                 for(MenuType menuType : weekMenu.getTypes()){
                     for(DayMenu menu : menuType.getDays()){
@@ -161,7 +163,7 @@ public class DataModel {
                     }
                 }
             }else{
-                if(hour <= 11){
+                if(hour <= LIMIT_HOUR){
                     for(MenuType menuType : weekMenu.getTypes()){
                         for(DayMenu menu : menuType.getDays()) {
                             if(menu.getDayOfWeek() == Utils.getCalendar().get(Calendar.DAY_OF_WEEK))
