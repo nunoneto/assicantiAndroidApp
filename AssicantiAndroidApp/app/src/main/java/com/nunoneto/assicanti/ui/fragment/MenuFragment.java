@@ -38,10 +38,9 @@ import java.util.Locale;
 
 public class MenuFragment extends Fragment {
 
-    public static final String NAME = "MENU";
+    public static final String TAG = "MENU_FRAG";
 
     private OnOrderFragmentListener mListener;
-    private final static String TAG = "FRAG_MENUS";
 
     //Tasks
     private GetMenusTask getMenusTask;

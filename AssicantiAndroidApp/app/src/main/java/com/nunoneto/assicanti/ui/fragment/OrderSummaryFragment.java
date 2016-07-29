@@ -71,6 +71,7 @@ public class OrderSummaryFragment extends Fragment {
         finishFlow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //  reset activity
                 startActivity(
                         new Intent(getActivity(), DayMenuActivity.class)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

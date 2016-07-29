@@ -27,7 +27,6 @@ import com.nunoneto.assicanti.tasks.GetSendOrderTask;
 import com.nunoneto.assicanti.tasks.SendOrderTask;
 import com.nunoneto.assicanti.ui.dialog.ExistingCustomerDataDialogFragment;
 import com.nunoneto.assicanti.ui.dialog.YesNoDialogListener;
-import com.nunoneto.assicanti.webscraper.WebScrapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,7 +46,7 @@ public class CustomerDataFragment extends Fragment {
     private OnOrderFragmentListener mListener;
 
     // Tasks
-    private GetSendOrderTask task;
+    private GetSendOrderTask getSendOrderTask;
     private SendOrderTask sendOrderTask;
 
     // Views
@@ -106,6 +105,7 @@ public class CustomerDataFragment extends Fragment {
         confirmOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                confirmOrderButton.setEnabled(false);
                 boolean validForm = true;
                 for(EditText editText : mandatoryFields){
                     if(editText.getText() == null || editText.getText().toString().isEmpty()){
@@ -128,7 +128,8 @@ public class CustomerDataFragment extends Fragment {
                             )
                     );
                     checkIfOpen();
-                }
+                }else
+                    confirmOrderButton.setEnabled(true);
 
             }
         });
@@ -140,8 +141,8 @@ public class CustomerDataFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        task = new GetSendOrderTask(this);
-        task.execute();
+        getSendOrderTask = new GetSendOrderTask(this);
+        getSendOrderTask.execute();
     }
 
     public void setSendOrderCodes(SendOrderCodes codes){
@@ -151,8 +152,8 @@ public class CustomerDataFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if(task != null && (task.getStatus() == AsyncTask.Status.PENDING || task.getStatus() == AsyncTask.Status.RUNNING))
-            task.cancel(true);
+        if(getSendOrderTask != null && (getSendOrderTask.getStatus() == AsyncTask.Status.PENDING || getSendOrderTask.getStatus() == AsyncTask.Status.RUNNING))
+            getSendOrderTask.cancel(true);
         if(sendOrderTask != null && (sendOrderTask.getStatus() == AsyncTask.Status.PENDING || sendOrderTask.getStatus() == AsyncTask.Status.RUNNING))
             sendOrderTask.cancel(true);
     }
@@ -176,6 +177,7 @@ public class CustomerDataFragment extends Fragment {
                 Log.e(TAG,"Failed to checkIfOpen");
                 t.printStackTrace();
                 contentLoadingProgressBar.hide();
+                confirmOrderButton.setEnabled(true);
             }
         });
 
@@ -187,13 +189,14 @@ public class CustomerDataFragment extends Fragment {
     }
 
     public void onSendOrderComplete(SendOrderResult sendOrderResult){
-        if(sendOrderResult == null){
+        if(sendOrderResult != null){
             saveOrder();
             mListener.goToSummary(sendOrderResult.getOrderId(),sendOrderResult.getData());
-            contentLoadingProgressBar.hide();
         }else{
             Snackbar.make(getView(),"Não foi possível submeter a encomenda",Snackbar.LENGTH_LONG).show();
         }
+        confirmOrderButton.setEnabled(true);
+        contentLoadingProgressBar.hide();
     }
 
     private void saveOrder() {

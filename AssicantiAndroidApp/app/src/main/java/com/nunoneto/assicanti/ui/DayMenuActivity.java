@@ -1,7 +1,9 @@
 package com.nunoneto.assicanti.ui;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.entity.OrderPhase;
@@ -32,11 +34,10 @@ public class DayMenuActivity extends NavigationDrawerActivity
 
     private void showMenus(){
         updateNavigation(OrderPhase.MENU);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container,new MenuFragment(),MenuFragment.NAME)
-                .addToBackStack(null)
-                .commit();
+
+        MenuFragment frag = new MenuFragment();
+        String backStateName = frag.getClass().getName();
+        replaceFragment(frag,backStateName, MenuFragment.TAG);
     }
 
 
@@ -55,21 +56,19 @@ public class DayMenuActivity extends NavigationDrawerActivity
     @Override
     public void showOptionals(Price price) {
         updateNavigation(OrderPhase.OPTIONALS);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container, OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier(),price.getId()),OptionalsFragment.NAME)
-                .addToBackStack(null)
-                .commit();
+
+        OptionalsFragment frag = OptionalsFragment.newInstance(price.getItemId(),price.getSize(),price.getTier(),price.getId());
+        String backStateName = frag.getClass().getName();
+        replaceFragment(frag,backStateName, OptionalsFragment.TAG);
     }
 
     @Override
     public void showForm() {
         updateNavigation(OrderPhase.CUSTOMERDATA);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container, CustomerDataFragment.newInstance(),CustomerDataFragment.TAG)
-                .addToBackStack(null)
-                .commit();
+
+        CustomerDataFragment frag = CustomerDataFragment.newInstance();
+        String backStateName = frag.getClass().getName();
+        replaceFragment(frag,backStateName, CustomerDataFragment.TAG);
     }
 
     @Override
@@ -80,12 +79,19 @@ public class DayMenuActivity extends NavigationDrawerActivity
     @Override
     public void goToSummary(String orderNumber, String deliveryDate) {
         updateNavigation(OrderPhase.SUMMARY);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container, OrderSummaryFragment.newInstance(orderNumber,deliveryDate),OrderSummaryFragment.TAG)
-                .addToBackStack(null)
-                .commit();
 
+        OrderSummaryFragment frag = OrderSummaryFragment.newInstance(orderNumber,deliveryDate);
+        String backStateName = frag.getClass().getName();
+        replaceFragment(frag,backStateName, OrderSummaryFragment.TAG);
+    }
+
+    private void replaceFragment (Fragment fragment, String backStateName, String tag){
+
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.container, fragment,tag);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 

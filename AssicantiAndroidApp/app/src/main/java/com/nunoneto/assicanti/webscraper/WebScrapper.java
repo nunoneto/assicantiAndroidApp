@@ -405,6 +405,7 @@ public class WebScrapper {
                     .data("action",RequestConstants.SendOrder.ACTION)
                     .data("vars[type]",RequestConstants.SendOrder.TYPE)
                     .data("vars[data]",data);
+            addCookies(conn);
             Document doc = conn.post();
 
             return new SendOrderResult(
@@ -422,7 +423,6 @@ public class WebScrapper {
     public SendOrderCodes getSendOrderHash(){
         try{
             Connection conn = Jsoup.connect("http://assicanti.pt/finalizar-encomenda/").timeout(JSOUP_TIMEOUT);
-
             addCookies(conn);
             Document doc = conn.get();
 

@@ -1,8 +1,10 @@
 package com.nunoneto.assicanti.ui.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -36,10 +38,9 @@ import retrofit2.Response;
 
 public class OptionalsFragment extends Fragment implements Callback<GetOptionalsResponse> {
 
-    public static final String NAME = "OPTIONALS";
+    public static final String TAG = "OPTIONALS_FRAG";
 
     private OnOrderFragmentListener mListener;
-    private final static String TAG = "OPTIONALS_FRAG";
 
     public static final String PARAM_ITEMID = "PARAM_ITEMID";
     public static final String PARAM_SIZE = "PARAM_SIZE";
@@ -81,11 +82,16 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
             this.size = b.getString(PARAM_SIZE);
             this.tier = b.getString(PARAM_TIER);
             this.priceId = b.getString(PARAM_PRICE_ID);
-            getOptionals();
         }else{
             //TODO: deal with failure -.-
         }
+    }
 
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getOptionals();
     }
 
     @Override
@@ -98,12 +104,17 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                nextButton.setEnabled(false);
                 addToCart1();
             }
         });
         contentLoadingProgressBar = (ContentLoadingProgressBar)view.findViewById(R.id.loading);
+
         contentLoadingProgressBar.bringToFront();
         contentLoadingProgressBar.show();
+
+        tabLayout.setTabTextColors(Color.parseColor("#000000"), Color.parseColor("#ffffff"));
+
         return view;
     }
 
@@ -170,6 +181,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
 
     private void addToCart1(){
         contentLoadingProgressBar.show();
+        contentLoadingProgressBar.setVisibility(View.VISIBLE);
         RestService.getInstance()
                 .getAssicantiService()
                 .addToCart1(
@@ -192,6 +204,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
                         t.printStackTrace();
                         contentLoadingProgressBar.hide();
                         Snackbar.make(getView(),"Não foi possível completar o pedido. Por favor tente mais tarde",Snackbar.LENGTH_SHORT).show();
+                        nextButton.setEnabled(true);
                     }
                 });
     }
@@ -216,7 +229,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
                 Log.e(TAG,"Could not complete addToCart 2 with cause: ");
                 t.printStackTrace();
                 Snackbar.make(getView(),"Não foi possível completar o pedido. Por favor tente mais tarde",Snackbar.LENGTH_SHORT).show();
-
+                nextButton.setEnabled(true);
             }
         });
     }
@@ -228,7 +241,10 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
 
     public void onRegisterResponse(String hash){
         contentLoadingProgressBar.hide();
-        mListener.showForm();
+        nextButton.setEnabled(true);
+        if(mListener != null)
+            mListener.showForm();
+
     }
 
 
