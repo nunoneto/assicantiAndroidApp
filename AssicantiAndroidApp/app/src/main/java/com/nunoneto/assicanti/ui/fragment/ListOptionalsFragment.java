@@ -22,15 +22,13 @@ import com.nunoneto.assicanti.network.RestService;
 import com.nunoneto.assicanti.network.response.AddOptionalResponse;
 import com.nunoneto.assicanti.ui.adapters.OptionalsListAdapter;
 
+import org.greenrobot.eventbus.EventBus;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ListOptionalsFragment extends Fragment {
-
-    public static final String NAME = "LIST_OPTIONALS";
-
-    private OnOrderFragmentListener mListener;
 
     private static final String TAG = "LISTOPTIONALS_FRAG";
     private static final String PARAM_POSITION = "POSITION";
@@ -39,7 +37,6 @@ public class ListOptionalsFragment extends Fragment {
     private int position;
     private String groupId;
 
-    private OptionalsFragment parentFragment;
 
     // Views
     private RecyclerView optionalsRecyclerView;
@@ -73,8 +70,6 @@ public class ListOptionalsFragment extends Fragment {
         optionalsRecyclerView = (RecyclerView)view.findViewById(R.id.optionalsRecyclerView);
         contentLoadingProgressBar = (ContentLoadingProgressBar)view.findViewById(R.id.loading);
 
-        parentFragment = (OptionalsFragment) getParentFragment();
-
         return view;
     }
 
@@ -102,7 +97,7 @@ public class ListOptionalsFragment extends Fragment {
     }
 
     private void addRemoveIngredient(final OptionalItem item, final CompoundButton compoundButton, final boolean checked ){
-        parentFragment.toggleNextButton(false);
+        EventBus.getDefault().post(new OptionalsFragment.ToggleNextEvent(false));
         contentLoadingProgressBar.show();
         compoundButton.setEnabled(false);
         RestService.getInstance().getAssicantiService()
@@ -119,12 +114,12 @@ public class ListOptionalsFragment extends Fragment {
                 Snackbar.make(getView(),checked ? "Opcional adicionado!" : "Opcional removido!",Snackbar.LENGTH_SHORT).show();
                 compoundButton.setEnabled(true);
                 contentLoadingProgressBar.hide();
-                parentFragment.toggleNextButton(true);
 
                 if(checked) // Add
                     DataModel.getInstance().getCurrentOrder().getOptionalItems().add(item);
                 else        // Remove
                     DataModel.getInstance().getCurrentOrder().getOptionalItems().remove(item);
+                EventBus.getDefault().post(new OptionalsFragment.ToggleNextEvent(true));
             }
 
             @Override
@@ -135,7 +130,7 @@ public class ListOptionalsFragment extends Fragment {
                 compoundButton.setChecked(false);
                 compoundButton.setEnabled(true);
                 contentLoadingProgressBar.hide();
-                parentFragment.toggleNextButton(true);
+                EventBus.getDefault().post(new OptionalsFragment.ToggleNextEvent(true));
             }
         });
 
@@ -146,17 +141,14 @@ public class ListOptionalsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnOrderFragmentListener) {
-            mListener = (OnOrderFragmentListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnOrderFragmentListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+    }
+
+    public interface ListOptionalsFragmentListener{
+        void onToggleNextButton();
     }
 }

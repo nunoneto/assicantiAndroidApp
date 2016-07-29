@@ -29,6 +29,9 @@ import com.nunoneto.assicanti.tasks.GetOptionalsTask;
 import com.nunoneto.assicanti.ui.adapters.OptionalsPagerAdapter;
 import com.nunoneto.assicanti.webscraper.WebScrapper;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,12 +88,9 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
         }else{
             //TODO: deal with failure -.-
         }
-    }
 
-    public void toggleNextButton(boolean toggle){
-        nextButton.setEnabled(toggle);
+        EventBus.getDefault().register(this);
     }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -181,6 +181,7 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
         if(doRegisterRequestTask != null && (doRegisterRequestTask.getStatus() == AsyncTask.Status.PENDING || doRegisterRequestTask.getStatus() == AsyncTask.Status.RUNNING)){
             doRegisterRequestTask.cancel(true);
         }
+        EventBus.getDefault().unregister(this);
     }
 
     private void addToCart1(){
@@ -251,8 +252,6 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
 
     }
 
-
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -268,6 +267,37 @@ public class OptionalsFragment extends Fragment implements Callback<GetOptionals
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    /**
+     * disable/enable the next button on event
+     * @param event
+     */
+    @Subscribe
+    public void onMessageEvent(ToggleNextEvent event){
+        nextButton.setEnabled(event.isToggle());
+
+    }
+
+    /**
+     * This events serves to toggle the netx button in this fragment when one of the child listOptionals fragments
+     * is in the process of checking/uncheking an ingredient, in order to avoid inconsistencies in the flow
+     */
+    public static class ToggleNextEvent{
+
+        private boolean toggle;
+
+        public ToggleNextEvent(boolean toggle) {
+            this.toggle = toggle;
+        }
+
+        public boolean isToggle() {
+            return toggle;
+        }
+
+        public void setToggle(boolean toggle) {
+            this.toggle = toggle;
+        }
     }
 
 }

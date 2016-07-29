@@ -24,7 +24,7 @@ public class DataModel {
 
     private static DataModel instance;
 
-    private final static int LIMIT_HOUR = 14;
+    private final static int LIMIT_HOUR = 14; // defines up to what hour an order can be performed to be delivered in the same day
 
     private List<WeekMenu> menus;
     private List<OptionalGroup> optionalGroups;

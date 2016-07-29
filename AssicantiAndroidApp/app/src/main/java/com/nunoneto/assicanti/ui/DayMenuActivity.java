@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 import com.nunoneto.assicanti.R;
 import com.nunoneto.assicanti.model.entity.OrderPhase;
@@ -17,7 +18,11 @@ import com.nunoneto.assicanti.ui.fragment.OrderSummaryFragment;
 public class DayMenuActivity extends NavigationDrawerActivity
         implements OnOrderFragmentListener {
 
+    private final static String TAG = "DAYMENU_ACTIVITY";
+
     private int orderPhase;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,10 @@ public class DayMenuActivity extends NavigationDrawerActivity
         getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
+                FragmentManager.BackStackEntry entry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount()-1);
+                Log.i(TAG,entry.getId()+"");
+                Log.i(TAG,entry.getName()+"");
+                Log.i(TAG,entry.getClass()+"");
 
             }
         });
